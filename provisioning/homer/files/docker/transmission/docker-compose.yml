@@ -1,0 +1,16 @@
+version: "2.1"
+services:
+    transmission:
+        image: lscr.io/linuxserver/transmission:latest
+        container_name: transmission
+        environment:
+            - TZ=Europe/Brussels
+        volumes:
+            - /etc/transmission/:/config
+            - /mnt/transmission/downloads:/downloads
+            - /mnt/transmission/watch:/watch
+        ports:
+            - 9091:9091
+            - 51413:51413
+            - 51413:51413/udp
+        restart: unless-stopped
