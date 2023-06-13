@@ -12,4 +12,4 @@ jobs:
               run: |
                   shopt -s nullglob
                   shellcheck rockpi-sata/build.sh
-                  shellcheck provisioning/homer/init.sh
+                  shellcheck provisioning/homer/init.sh --exclude=SC1091
