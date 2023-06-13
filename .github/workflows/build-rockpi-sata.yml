@@ -1,0 +1,31 @@
+name: RPM Build BashPass
+on:
+    push:
+        paths:
+            - "rockpi-sata/**"
+    pull_request:
+        paths:
+            - "rockpi-sata/**"
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Install Pre-requirements
+              run: |
+                  sudo apt update
+                  sudo apt install -y rpm
+
+            - name: build rockpi-sata RPM package
+              id: rpm
+              run: |
+                  cd rockpi-sata/ || exit 1
+                  bash build.sh
+                  cp -r ~/rpmbuild/RPMS/noarch/* .
+
+            - uses: actions/upload-artifact@v2
+              with:
+                  name: rpm
+                  path: rockpi-sata/*.rpm
