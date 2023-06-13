@@ -8,16 +8,6 @@ set -o pipefail # Don't hide errors within pipes.
 readonly NAME='rockpi-sata'
 readonly VERSION='0.14'
 
-# Whenever an error occurs, we want to notify the user about it.
-# This is a basic function that wil print the corresponding error
-# message to stderr, and will exit with the given exit status.
-error_out() {
-    printf '\n'
-    printf 'An error occurred: %s' "${1}" >&2
-    printf '\n'
-    exit "${2}"
-}
-
 # Prepare the tarball.
 mkdir -p "${NAME}-${VERSION}"
 mkdir -p "${NAME}-${VERSION}/usr/bin/"
