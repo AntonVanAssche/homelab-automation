@@ -1,6 +1,6 @@
 <div align="center">
     <h1>
-        Homelab Automation
+        Homelab Automation - Still a work in progress!
     </h1>
     <p align="center">
         All scripts used to automate the setup of my homelab 
