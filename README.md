@@ -39,6 +39,39 @@ Key features of Marge include:
 -   Samba: A file-sharing service that allows seamless access to shared files within the local network.
 -   RAID 5: A data storage technology that provides redundancy and fault tolerance to the homelab storage system.
 
+## Setup Guide
+
+In order to configure one of the servers you'll have to create the following `.env` file in the root directory of each server (i.e. `provisioning/homer` or `provisioning/marge`)):
+
+```
+# Network configuration
+NETWORK_INTERFACE=              # e.g. "Wired connection 1"
+HOMER_IP_ADDRESS=               # e.g. "192.168.0.66"
+MARGE_IP_ADDRESS=               # e.g. "192.168.0.67"
+SUBNET_MASK_CIDR=               # e.g. "24"
+DEFAULT_GATEWAY=                # e.g. "192.168.0.1"
+DNS_SERVER=                     # e.g. "1.1.1.1"
+
+# Host configuration
+HOST_NAME=                      # "homer" or "marge"
+USER_NAME=                      # "homer" or "marge"
+USER_PASSWORD=                  # e.g. "password", but a bit more secure ;)
+
+# Server configuration
+SERVER_DOMAIN=                  # e.g. "homelab.local"
+
+# Timezone configuration
+TIMEZONE=                       # e.g. "Europe/Brussels"
+```
+
+Afterwards, you start the configuration process by running the following command:
+
+```bash
+# bash init.sh
+```
+
+**Note:** The script **must** be run as root (`sudo -i`).
+
 ## Contributing
 
 Feel free to contribute to this repository by submitting pull requests with improvements, bug fixes, or additional server configurations. Your contributions are highly appreciated!
