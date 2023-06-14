@@ -178,6 +178,42 @@ podman generate systemd --new --name pihole > /etc/systemd/system/pihole.service
 systemctl daemon-reload
 systemctl enable --now pihole.service
 
+dnf install -y \
+    kmod-wireguard \
+    wireguard-tools
+dnf copr enable -y jdoss/wireguard
+dnf update -y
+dnf install -y wireguard-dkms
+
+modprobe wireguard
+modprobe fuse
+modprobe iptable_raw
+printf 'wireguard\nfuse\niptable_raw' > /etc/modules-load.d/wireguard.conf
+
+mkdir -p /var/lib/podman/volumes/configs/wireguard
+
+podman run -d \
+    --name=wireguard \
+    --cap-add=NET_ADMIN \
+    --env PUID=1000 \
+    --env PGID=1000 \
+    --env TZ="${TIMEZONE}" \
+    --env SERVERURL="${PUBLIC_DNS}" \
+    --env PEERS=laptop,phone \
+    --env PEERDNS=10.13.13.1 \
+    --env INTERNAL_SUBNET=10.13.13.0 \
+    --env ALLOWEDIPS=0.0.0.0/0 \
+    --publish 51820:51820/udp \
+    --volume /var/lib/podman/volumes/configs/wireguard:/config:Z \
+    --volume /lib/modules:/lib/modules:ro \
+    --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
+    --restart unless-stopped \
+    lscr.io/linuxserver/wireguard:latest
+
+podman generate systemd --new --name wireguard > /etc/systemd/system/wireguard.service
+systemctl daemon-reload
+systemctl enable --now wireguard.service
+
 #################
 # Raxda Drivers #
 #################
