@@ -30,6 +30,7 @@ dnf install -y \
     jq \
     patch \
     epel-release \
+    elrepo-release \
     mdadm
 
 # Enable essential services.
@@ -162,29 +163,15 @@ fi
 
 dnf module install -y container-tools:ol8
 
-sudo podman network create \
-    --driver macvlan \
-    --opt parent=enp4s0 \
-    --subnet 192.168.0.0/24 \
-    --gateway 192.168.0.1 \
-    --ip-range 192.168.0.230/24 podman-vlan
-
-cp files/systemd/podman-network.service /etc/systemd/system/
-systemctl daemon-reload
-systemctl enable --now podman-network.service
+mkdir -p /var/lib/podman/volumes/configs/{pihole,dnsmasq.d}
 
 podman run -d \
     --name pihole \
-    --cap-add=NET_ADMIN \
-    --net=mymacnet \
-    --ip=192.168.0.230 \
-    -v "/home/${USER_NAME}/configs/pihole:/etc/pihole" \
-    -v "/home/${USER_NAME}/configs/dnsmasq.d:/etc/dnsmasq.d" \
-    --restart=unless-stopped \
-    --hostname pihole \
-    --security-opt label=disable \
-    -e TZ="${TIMEZONE}" \
-    -e FTLCONF_LOCAL_IPV4=192.168.0.230 \
+    --volume /var/lib/podman/volumes/configs/pihole:/etc/pihole:Z \
+    --volume /var/lib/podman/volumes/configs/dnsmasq.d:/etc/dnsmasq.d:Z \
+    --publish 53:53/tcp \
+    --publish 53:53/udp \
+    --publish 80:80/tcp \
     docker.io/pihole/pihole:latest
 
 podman generate systemd --new --name pihole > /etc/systemd/system/pihole.service

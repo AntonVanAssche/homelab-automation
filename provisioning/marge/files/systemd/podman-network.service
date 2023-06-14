@@ -1,8 +1,0 @@
-[Unit]
-After=network.target
-
-[Service]
-ExecStart=/usr/local/bin/podman-network.sh
-
-[Install]
-WantedBy=default.target
