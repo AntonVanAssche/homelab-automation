@@ -13,3 +13,4 @@ jobs:
                   shopt -s nullglob
                   shellcheck rockpi-sata/build.sh
                   shellcheck provisioning/homer/init.sh --exclude=SC1091
+                  shellcheck provisioning/marge/init.sh --exclude=SC1091
