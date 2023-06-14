@@ -399,3 +399,19 @@ podman generate systemd --new --name emby > /etc/systemd/system/emby.service
 systemctl daemon-reload
 systemctl enable --now emby.service
 
+podman run -d \
+    --name transmission \
+    --env PUID=10000 \
+    --env PGID=1000 \
+    --env TZ="${TIMEZONE}" \
+    --volume /var/lib/podman/volumes/configs/transmission/config:/config:Z \
+    --volume /mnt/transmission/downloads:/downloads:Z \
+    --volume /mnt/transmission/torrents:/watch:Z \
+    --publish 9300:9091/tcp \
+    --publish 51413:51413/tcp \
+    --publish 51413:51413/udp \
+    lscr.io/linuxserver/transmission:latest
+
+podman generate systemd --new --name transmission > /etc/systemd/system/transmission.service
+systemctl daemon-reload
+systemctl enable --now transmission.service
