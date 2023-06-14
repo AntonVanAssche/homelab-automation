@@ -59,6 +59,7 @@ timedatectl set-timezone "${TIMEZONE}"
 #######
 
 patch /etc/ssh/sshd_config < ./files/patches/sshd_config.patch
+cp -r ./files/motd /etc/motd
 
 ############
 # Firewall #
