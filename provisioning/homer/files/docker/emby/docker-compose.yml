@@ -3,12 +3,13 @@ services:
     emby:
         image: docker.io/emby/embyserver:latest
         container_name: emby
+        user: 1000
         environment:
             - PUID=1000
             - PGID=1000
             - TZ=Europe/Brussels
         volumes:
-            - /home/homer/config/emby:/config
+            - /home/homer/configs/emby:/config
             - /mnt/emby/series:/data/tvshows
             - /mnt/emby/movies:/data/movies
             - /mnt/emby/documentaries:/data/documentaries
