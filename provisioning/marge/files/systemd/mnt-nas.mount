@@ -1,0 +1,14 @@
+[Unit]
+DefaultDependencies=no
+Conflicts=umount.target
+After=rockpi-sata.service
+Before=local-fs.target umount.target
+
+[Mount]
+What=/dev/disk/by-uuid/61e45c91-2115-4cae-8ae1-24cde13643b2
+Where=/mnt/nas
+Type=ext4
+Options=defaults,noatime
+
+[Install]
+WantedBy=local-fs.target

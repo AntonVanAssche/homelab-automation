@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+    pihole:
+        container_name: pihole
+        image: docker.io/pihole/pihole:latest
+        user: 1000
+        ports:
+            - "54:53/tcp"
+            - "54:53/udp"
+            - "80:80/tcp"
+        environment:
+            TZ: "America/Chicago"
+        volumes:
+            - /home/marge/configs/pihole:/etc/pihole
+            - /home/marge/configs/dnsmasq.d:/etc/dnsmasq.d
+        restart: unless-stopped

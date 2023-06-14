@@ -1,0 +1,20 @@
+--- smb.conf	2023-06-14 09:09:10.298783992 +0200
++++ smb.conf	2023-06-14 09:09:53.595123322 +0200
+@@ -41,4 +41,14 @@
+         write list = @printadmin root
+         force group = @printadmin
+         create mask = 0664
+-        directory mask = 0775
+\ No newline at end of file
++        directory mask = 0775
++
++# NAS Share
++[NAS]
++path = /mnt/nas/
++comment = RasPi NAS Share
++valid users = marge
++writable = yes
++browsable = yes
++create mask = 0644
++directory mask = 0755
+\ No newline at end of file
