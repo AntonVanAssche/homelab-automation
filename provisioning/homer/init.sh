@@ -73,7 +73,7 @@ firewall-cmd --add-service=samba --permanent
 
 firewall-cmd --add-port=3000/tcp --permanent
 firewall-cmd --add-port=8096/tcp --permanent
-firewall-cmd --add-port=9091/tcp --permanent
+firewall-cmd --add-port=9100/tcp --permanent
 firewall-cmd --add-port=9200/tcp --permanent
 firewall-cmd --add-port=9300/tcp --permanent
 
@@ -160,20 +160,6 @@ cat << EOF > /etc/httpd/conf.d/reverse-proxy-http.conf
 EOF
 
 cat << EOF > /etc/httpd/conf.d/reverse-proxy-https.conf
-# Default Virtual Host for ${SERVER_DOMAIN}.
-<VirtualHost *:443>
-    ServerName ${SERVER_DOMAIN}
-
-    SSLEngine on
-    SSLCertificateFile ${crt_location}
-    SSLCertificateKeyFile ${key_location}
-
-    ProxyPreserveHost On
-    ProxyRequests Off
-    ProxyPass / http://127.0.0.1:5000/
-    ProxyPassReverse / http://127.0.0.1:5000/
-</VirtualHost>
-
 # Virtual Host for Pi-hole.
 <VirtualHost *:443>
     ServerName pihole.${SERVER_DOMAIN}
@@ -184,8 +170,8 @@ cat << EOF > /etc/httpd/conf.d/reverse-proxy-https.conf
 
     ProxyPreserveHost On
     ProxyRequests Off
-    ProxyPass /admin/ http://127.0.0.1:80/admin/
-    ProxyPassReverse /admin/ http://127.0.0.1:80/admin/
+    ProxyPass /admin/ http://${MARGE_IP_ADDRESS}:80/admin/
+    ProxyPassReverse /admin/ http://${MARGE_IP_ADDRESS}:80/admin/
 </VirtualHost>
 
 # Virtual Host for Grafana.
@@ -226,22 +212,8 @@ cat << EOF > /etc/httpd/conf.d/reverse-proxy-https.conf
 
     ProxyPreserveHost On
     ProxyRequests Off
-    ProxyPass / http://127.0.0.1:9091/
-    ProxyPassReverse / http://127.0.0.1:9091/
-</VirtualHost>
-
-# Virtual Host for Portainer.
-<VirtualHost *:443>
-    ServerName portainer.${SERVER_DOMAIN}
-
-    SSLEngine on
-    SSLCertificateFile ${crt_location}
-    SSLCertificateKeyFile ${key_location}
-
-    ProxyPreserveHost On
-    ProxyRequests Off
-    ProxyPass / http://127.0.0.1:9443/
-    ProxyPassReverse / http://127.0.0.1:9443/
+    ProxyPass / http://127.0.0.1:9300/
+    ProxyPassReverse / http://127.0.0.1:9300/
 </VirtualHost>
 
 # Virtual Host for Samba Share on Marge.
