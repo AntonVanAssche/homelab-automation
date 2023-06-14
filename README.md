@@ -14,7 +14,7 @@
 
 ## About The Project
 
-The Homelab Project is a personal endeavor to create a small-scale, self-hosted infrastructure using two Raspberry Pi 4B devices. The project consists of two servers, named Homer and Marge, each serving different purposes within the homelab environment.
+The Homelab Project is a personal endeavor to create a small-scale, self-hosted infrastructure using two Raspberry Pi 4B devices. The project consists of two servers, named Homer and Marge, each serving different purposes within the homelab environment. Both servers run Oracle Linux 8, since it's one of the few RHEL-based Linux distributions that officially supports the Raspberry Pi 4B.
 
 ## Server: Homer
 
