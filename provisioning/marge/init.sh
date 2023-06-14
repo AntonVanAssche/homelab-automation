@@ -162,7 +162,7 @@ fi
 
 dnf module install -y container-tools:ol8
 
-sudo podman network create \ 
+sudo podman network create \
     --driver macvlan \
     --opt parent=enp4s0 \
     --subnet 192.168.0.0/24 \
