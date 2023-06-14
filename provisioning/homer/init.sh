@@ -300,6 +300,18 @@ for MACHINE in "${MACHINES[@]}"; do
     done
 done
 
+curl -s -X POST -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${grafana_api_key}" \
+    -d "{
+        \"name\":\"Discord\",
+        \"type\":\"discord\",
+        \"settings\":{
+            \"url\":\"${DISCORD_WEBHOOK_URL}\",
+            \"sendReminder\":true
+        }
+    }" \
+    http://localhost:3000/api/v1/provisioning/contact-points
+
 # Delete the API key for the admin user, as it is no longer needed.
 curl -S -X DELETE -H "Content-Type: application/json" \
     -d '{"name":"vagrant","role":"Admin"}' \
