@@ -382,9 +382,20 @@ fi
 
 dnf module install -y container-tools:ol8
 
-chown -R "${USER_NAME}:${USER_NAME}" /mnt/
+mkdir -p /var/lib/podman/volumes/configs/emby/config
 
-for container in files/docker/*; do
-    sudo -u "${USER_NAME}" \
-        podman-compose -f "${container}/docker-compose.yml" up -d
-done
+podman run -d \
+    --env PUID=10000 \
+    --env PGID=1000 \
+    --env TZ="${TIMEZONE}" \
+    --volume /var/lib/podman/volumes/configs/emby:/config:Z \
+    --volume /mnt/series:/data/series:Z \
+    --volume /mnt/movies:/data/movies:Z \
+    --volume /mnt/documentaries:/data/documentaries:Z \
+    --publish 8096:8096 \
+    docker.io/emby/embyserver:latest
+
+podman generate systemd --new --name emby > /etc/systemd/system/emby.service
+systemctl daemon-reload
+systemctl enable --now emby.service
+
