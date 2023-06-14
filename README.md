@@ -36,7 +36,7 @@ To facilitate the usage of the Raxda Rock Pi SATA HAT, a script has been created
 
 By leveraging the power of Samba, Marge enables seamless access and interaction with the stored data from other devices on the network. Computers running Windows, macOS, or Linux can effortlessly connect to Marge and take advantage of the SMB protocol's compatibility and interoperability features. This allows for efficient file transfers, sharing, and collaborative workflows, regardless of the operating system being used.
 
-Besides Samba, Marge also hosts a Pihole instance to provide network-wide ad-blocking capabilities. Pihole is a DNS sinkhole that blocks advertisements and trackers at the network level. It is configured to use the Unbound DNS resolver to provide DNS-over-TLS (DoT) and DNS-over-HTTPS (DoH) capabilities. This ensures that all DNS queries are encrypted and secure, preventing any malicious actors from intercepting and manipulating the DNS traffic. Marge also provides a WireGuard VPN server to enable secure remote access to the homelab environment from anywhere in the world.
+Besides Samba, Marge also hosts a Pihole instance to provide network-wide ad-blocking capabilities. Pihole is a DNS sinkhole that blocks advertisements and trackers at the network level. Marge also provides a WireGuard VPN server to enable secure remote access to the homelab environment from anywhere in the world.
 
 ## Setup Guide
 
