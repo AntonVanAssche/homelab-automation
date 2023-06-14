@@ -81,7 +81,7 @@ firewall-cmd --reload
 if ! id "${USER_NAME}" &>/dev/null; then
     useradd -m -s /bin/bash "${USER_NAME}"
     usermod -aG wheel "${USER_NAME}"
-    printf "${USER_PASSWORD}" | passwd "${USER_NAME}" --stdin
+    printf '%s' "${USER_PASSWORD}" | passwd "${USER_NAME}" --stdin
 fi
 
 ############
