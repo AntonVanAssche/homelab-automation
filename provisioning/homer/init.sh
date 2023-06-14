@@ -25,18 +25,16 @@ dnf update -y
 # Install essential packages.
 dnf install -y \
     git \
-    bind-utils \
-    cockpit \
     vim-enhanced \
     tree \
     jq \
+    patch \
     epel-release \
     httpd \
     mod_ssl
 
 # Enable essential services.
 systemctl enable --now firewalld
-systemctl enable --now cockpit.socket
 
 ####################
 # Network Settings #
@@ -69,16 +67,14 @@ patch /etc/ssh/sshd_config < ./files/patches/sshd_config.patch
 
 firewall-cmd --add-service=http --permanent
 firewall-cmd --add-service=https --permanent
-firewall-cmd --add-service=dns --permanent
 firewall-cmd --add-service=ssh --permanent
 firewall-cmd --add-service=samba --permanent
 
 firewall-cmd --add-port=3000/tcp --permanent
 firewall-cmd --add-port=8096/tcp --permanent
-firewall-cmd --add-port=9090/tcp --permanent
 firewall-cmd --add-port=9091/tcp --permanent
-firewall-cmd --add-port=9100/tcp --permanent
-firewall-cmd --add-port=9443/tcp --permanent
+firewall-cmd --add-port=9200/tcp --permanent
+firewall-cmd --add-port=9300/tcp --permanent
 
 firewall-cmd --add-port=51413/udp --permanent
 firewall-cmd --add-port=51820/udp --permanent
@@ -270,29 +266,26 @@ setsebool -P httpd_can_network_connect 1
 # Restart the httpd service.
 systemctl restart httpd
 
-###################
-# Podman & Docker #
-###################
-
-dnf module install -y container-tools:ol8
-
-for container in ./files/docker/*; do
-    printf "Starting %s...\n" "${container}"
-    podman-compose -f "${container}/docker-compose.yml" up -d
-done
-
 ###########
 # Grafana #
 ###########
 
+cp "files/yum/repos/grafana.repo" /etc/yum.repos.d/grafana.repo
+dnf install -y grafana
+
+systemctl daemon-reload
+systemctl enable --now grafana-server
+
+# Generate a API key for the admin user.
+command -v jq >/dev/null 2>&1 || dnf install -y jq
 grafana_api_key=$(curl -s -X POST -H "Content-Type: application/json" \
     -d '{"name":"vagrant","role":"Admin"}' \
     http://admin:admin@localhost:3000/api/auth/keys | jq -r '.key')
 
 declare -a MACHINES
 MACHINES=(
-    Homer ${HOMER_IP_ADDRESS}
-    Marge ${MARGE_IP_ADDRESS}
+    "Homer ${HOMER_IP_ADDRESS}"
+    "Marge ${MARGE_IP_ADDRESS}"
 )
 
 for MACHINE in "${MACHINES[@]}"; do
@@ -322,7 +315,7 @@ for MACHINE in "${MACHINES[@]}"; do
         http://localhost:3000/api/search | \
         jq -r ".[] | select(.type == \"dash-folder\") | select(.title == \"${MACHINE_NAME}\") | .id")
 
-    for dashboard in ./files/grafana/${MACHINE_NAME}/*.json; do
+    for dashboard in ./files/grafana/"${MACHINE_NAME,,}"/*.json; do
         curl -s -X POST -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${grafana_api_key}" \
             -d "{
@@ -338,3 +331,75 @@ done
 curl -S -X DELETE -H "Content-Type: application/json" \
     -d '{"name":"vagrant","role":"Admin"}' \
     http://admin:admin@localhost:3000/api/auth/keys/1
+
+############################
+# Promethues Node Exporter #
+############################
+
+if ! id prometheus >/dev/null 2>&1; then
+    groupadd --system prometheus
+    useradd -s /sbin/nologin --system -g prometheus prometheus
+
+    mkdir -p /var/lib/prometheus
+    mkdir -p /etc/prometheus/{rules,rules.d,files_sd}
+
+    curl -s https://api.github.com/repos/prometheus/prometheus/releases/latest | \
+        grep browser_download_url | \
+        grep linux-arm64 | \
+        cut -d '"' -f 4 | \
+        wget -qi -
+
+    tar -xzf prometheus-*.linux-amd64.tar.gz
+    cp -r prometheus-*/{prometheus,promtool} /usr/local/bin/
+    cp -r prometheus-*/{consoles,console_libraries,prometheus.yml} /etc/prometheus/
+
+    chown -R prometheus:prometheus /etc/prometheus
+    chown -R prometheus:prometheus /var/lib/prometheus
+    chmod -R 775 /var/lib/prometheus
+
+    cp "files/prometheus/prometheus.yml" /etc/prometheus/prometheus.yml
+
+    cp "files/systemd/prometheus.service" /etc/systemd/system/prometheus.service
+
+    systemctl daemon-reload
+    systemctl enable --now prometheus
+
+    mkdir -p /var/lib/prometheus/node_exporter
+
+    curl -s https://api.github.com/repos/prometheus/node_exporter/releases/latest | \
+        grep browser_download_url | \
+        grep linux-arm64 | \
+        cut -d '"' -f 4 | \
+        wget -qi -
+
+    tar -xzf node_exporter-*.linux-amd64.tar.gz
+    cp -r node_exporter-*/* /var/lib/prometheus/node_exporter/
+
+    chown -R prometheus:prometheus /var/lib/prometheus/node_exporter
+    chmod -R 775 /var/lib/prometheus/node_exporter
+
+    cp -r /var/lib/prometheus/node_exporter/node_exporter /usr/local/bin/node_exporter
+
+    cp "files/systemd/node_exporter.service" /etc/systemd/system/node_exporter.service
+
+    systemctl daemon-reload
+    systemctl enable --now node_exporter
+
+    rm -rf prometheus-*.linux-amd64.tar.gz \
+        node_exporter-*.linux-amd64.tar.gz \
+        prometheus-* \
+        node_exporter-*
+fi
+
+###################
+# Podman & Docker #
+###################
+
+dnf module install -y container-tools:ol8
+
+chown -R "${USER_NAME}:${USER_NAME}" /mnt/
+
+for container in files/docker/*; do
+    sudo -u "${USER_NAME}" \
+        podman-compose -f "${container}/docker-compose.yml" up -d
+done
