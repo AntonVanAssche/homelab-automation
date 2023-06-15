@@ -235,15 +235,15 @@ for client_name in "${CLIENTS[@]}"; do
         /etc/wireguard/clients/wg0-client-${client_name}.public.key \
         /etc/wireguard/clients/wg0-client-${client_name}.psk
     
-    cat << EOF > /etc/wireguard/clients/wg0-client-${client_name}.conf
+    cat << EOF > "/etc/wireguard/clients/wg0-client-${client_name}.conf"
 [Interface]
-PrivateKey = $(cat /etc/wireguard/clients/wg0-client-${client_name}.private.key)
+PrivateKey = $(cat "/etc/wireguard/clients/wg0-client-${client_name}.private.key")
 Address = 10.82.146.${i}/24
 DNS = ${DNS_SERVER}
 
 [Peer]
-PublicKey = $(cat /etc/wireguard/${HOSTNAME}.public.key)
-PreSharedKey = $(cat /etc/wireguard/clients/wg0-client-${client_name}.psk)
+PublicKey = $(cat "/etc/wireguard/${HOSTNAME}.public.key")
+PreSharedKey = $(cat "/etc/wireguard/clients/wg0-client-${client_name}.psk")
 Endpoint = ${PUBLIC_IP_ADDRESS}:51820
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 30
@@ -253,8 +253,8 @@ EOF
 
 # BEGIN ${client_name}
 [Peer]
-PublicKey = $(cat /etc/wireguard/clients/wg0-client-${client_name}.public.key)
-PreSharedKey = $(cat /etc/wireguard/clients/wg0-client-${client_name}.psk)
+PublicKey = $(cat "/etc/wireguard/clients/wg0-client-${client_name}.public.key")
+PreSharedKey = $(cat "/etc/wireguard/clients/wg0-client-${client_name}.psk")
 AllowedIPs = 10.82.146.${i}/32
 # END ${client_name}
 EOF
