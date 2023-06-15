@@ -261,8 +261,8 @@ EOF
 
     # Generate QR codes and save them to PNG files.
     printf 'Client %s:\n' "${client_name}"
-    qrencode -t ansiutf8 < /etc/wireguard/clients/wg0-client-${client_name}.conf
-    qrencode -t png -o /etc/wireguard/clients/wg0-client-${client_name}.png < /etc/wireguard/clients/wg0-client-${client_name}.conf
+    qrencode -t ansiutf8 < "/etc/wireguard/clients/wg0-client-${client_name}.conf"
+    qrencode -t png -o "/etc/wireguard/clients/wg0-client-${client_name}.png" < "/etc/wireguard/clients/wg0-client-${client_name}.conf"
 
     i=$((i++))
 done
