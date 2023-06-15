@@ -190,7 +190,7 @@ dnf install -y \
     wireguard-tools \
     qrencode
 
-mkdir -p /etc/wireguard/${HOSTNAME}
+mkdir -p "/etc/wireguard/${HOSTNAME}"
 
 [[ -f "/etc/sysctl.conf" ]] && \
     cat << EOF >> /etc/sysctl.conf
@@ -200,15 +200,15 @@ EOF
 sysctl -p
 
 wg genkey | \
-    tee /etc/wireguard/${HOSTNAME}.private.key | \
-    wg pubkey > /etc/wireguard/${HOSTNAME}.public.key
+    tee "/etc/wireguard/${HOSTNAME}.private.key" | \
+    wg pubkey > "/etc/wireguard/${HOSTNAME}.public.key"
 
-chmod 600 /etc/wireguard/${HOSTNAME}.private.key \
-    /etc/wireguard/${HOSTNAME}.public.key
+chmod 600 "/etc/wireguard/${HOSTNAME}.private.key" \
+    "/etc/wireguard/${HOSTNAME}.public.key"
 
 cat << EOF > /etc/wireguard/wg0.conf
 [Interface]
-PrivateKey = $(cat /etc/wireguard/${HOSTNAME}.private.key)
+PrivateKey = $(cat "/etc/wireguard/${HOSTNAME}.private.key")
 Address = 10.82.146.1/24
 MTU = 1420
 ListenPort = 51820
@@ -227,13 +227,13 @@ declare -i i=2
 
 for client_name in "${CLIENTS[@]}"; do
     wg genkey | \
-        tee /etc/wireguard/clients/wg0-client-${client_name}.private.key | \
-        wg pubkey > /etc/wireguard/clients/wg0-client-${client_name}.public.key
-    wg genpsk > /etc/wireguard/clients/wg0-client-${client_name}.psk
+        tee "/etc/wireguard/clients/wg0-client-${client_name}.private.key" | \
+        wg pubkey > "/etc/wireguard/clients/wg0-client-${client_name}.public.key"
+    wg genpsk > "/etc/wireguard/clients/wg0-client-${client_name}.psk"
     
-    chmod 600 /etc/wireguard/clients/wg0-client-${client_name}.private.key \
-        /etc/wireguard/clients/wg0-client-${client_name}.public.key \
-        /etc/wireguard/clients/wg0-client-${client_name}.psk
+    chmod 600 "/etc/wireguard/clients/wg0-client-${client_name}.private.key" \
+        "/etc/wireguard/clients/wg0-client-${client_name}.public.key" \
+        "/etc/wireguard/clients/wg0-client-${client_name}.psk"
     
     cat << EOF > "/etc/wireguard/clients/wg0-client-${client_name}.conf"
 [Interface]
