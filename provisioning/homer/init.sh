@@ -32,7 +32,8 @@ dnf install -y \
     tree \
     jq \
     httpd \
-    mod_ssl
+    mod_ssl \
+    firewalld
 
 # Enable essential services.
 systemctl enable --now firewalld

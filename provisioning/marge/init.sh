@@ -32,7 +32,8 @@ dnf install -y \
     tree \
     jq \
     patch \
-    mdadm
+    mdadm \
+    firewalld
 
 # Enable essential services.
 systemctl enable --now firewalld
