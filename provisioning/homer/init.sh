@@ -384,7 +384,9 @@ fi
 # Podman & Docker #
 ###################
 
-dnf module install -y container-tools:ol8
+dnf install -y \
+    podman \
+    podman-docker
 
 mkdir -p /var/lib/podman/volumes/configs/emby/config \
     /mnt/series \
