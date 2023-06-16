@@ -4,8 +4,8 @@
  # Authentication:
  
  #LoginGraceTime 2m
--PermitRootLogin no
-+#PermitRootLogin prohibit-password
+-#PermitRootLogin prohibit-password
++PermitRootLogin no
  #StrictModes yes
  #MaxAuthTries 6
  #MaxSessions 10
@@ -13,8 +13,8 @@
  #IgnoreRhosts yes
  
  # To disable tunneled clear text passwords, change to no here!
--PasswordAuthentication no
-+#PasswordAuthentication yes
+-#PasswordAuthentication yes
++PasswordAuthentication no
  #PermitEmptyPasswords no
  
  # Change to no to disable s/key passwords
@@ -22,8 +22,8 @@
  #VersionAddendum none
  
  # no default banner path
--Banner /etc/banner
-+#Banner none
+-#Banner none
++Banner /etc/banner
  
  # override default of no subsystems
  Subsystem	sftp	/usr/libexec/openssh/sftp-server
