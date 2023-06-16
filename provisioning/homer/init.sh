@@ -292,7 +292,7 @@ for MACHINE in "${MACHINES[@]}"; do
         http://localhost:3000/api/search | \
         jq -r ".[] | select(.type == \"dash-folder\") | select(.title == \"${MACHINE_NAME}\") | .id")
 
-    for dashboard in ./files/grafana/"${MACHINE_NAME,,}"/*.json; do
+    for dashboard in ./files/grafana/dashboards/"${MACHINE_NAME,,}"/*.json; do
         curl -s -X POST -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${grafana_api_key}" \
             -d "{
