@@ -177,6 +177,9 @@ systemctl disable --now systemd-resolved
 unlink /etc/resolv.conf
 systemctl restart NetworkManager
 
+# We have to wait for the network to be up.
+sleep 5
+
 podman run -d \
     --name pihole \
     --env TZ="${TIMEZONE}" \
