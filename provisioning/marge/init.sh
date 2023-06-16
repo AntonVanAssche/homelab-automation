@@ -167,8 +167,16 @@ dnf install -y \
 
 mkdir -p /var/lib/podman/volumes/configs/{pihole,dnsmasq.d}
 
+# Fix port 53 already bound error.
+# This port is used by systemd-resolved.
+systemctl disable --now systemd-resolved
+unlink /etc/resolv.conf
+systemctl restart NetworkManager
+
 podman run -d \
     --name pihole \
+    --env TZ="${TIMEZONE}" \
+    --env WEBPASSWORD="${PIHOLE_PASSWORD}" \
     --volume /var/lib/podman/volumes/configs/pihole:/etc/pihole:Z \
     --volume /var/lib/podman/volumes/configs/dnsmasq.d:/etc/dnsmasq.d:Z \
     --publish 53:53/tcp \
