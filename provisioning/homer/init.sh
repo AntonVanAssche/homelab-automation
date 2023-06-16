@@ -394,6 +394,7 @@ mkdir -p /var/lib/podman/volumes/configs/emby/config \
     /mnt/documentaries
 
 podman run -d \
+    --name emby \
     --env PUID=10000 \
     --env PGID=1000 \
     --env TZ="${TIMEZONE}" \
