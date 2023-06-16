@@ -384,7 +384,10 @@ fi
 
 dnf module install -y container-tools:ol8
 
-mkdir -p /var/lib/podman/volumes/configs/emby/config
+mkdir -p /var/lib/podman/volumes/configs/emby/config \
+    /mnt/series \
+    /mnt/movies \
+    /mnt/documentaries
 
 podman run -d \
     --env PUID=10000 \
@@ -400,6 +403,10 @@ podman run -d \
 podman generate systemd --new --name emby > /etc/systemd/system/emby.service
 systemctl daemon-reload
 systemctl enable --now emby.service
+
+mkdir -p /var/lib/podman/volumes/configs/transmission/config \
+    /mnt/transmission/downloads \
+    /mnt/transmission/torrents
 
 podman run -d \
     --name transmission \
