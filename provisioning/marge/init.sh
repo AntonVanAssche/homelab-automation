@@ -19,6 +19,9 @@ fi
 # Disable the root account.
 usermod -s /usr/sbin/nologin root
 
+# Optimize the DNF configuration.
+cp -r ./files/dnf/dnf.conf /etc/dnf/dnf.conf
+
 # Update the system.
 dnf update -y
 
