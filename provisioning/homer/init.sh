@@ -172,10 +172,17 @@ cat << EOF > /etc/httpd/conf.d/reverse-proxy-https.conf
     SSLCertificateFile ${crt_location}
     SSLCertificateKeyFile ${key_location}
 
+    SSLEngine on
+    SSLHonorCipherOrder off
+    Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"
+
     ProxyPreserveHost On
     ProxyRequests Off
-    ProxyPass /admin/ http://${MARGE_IP_ADDRESS}:80/admin/
-    ProxyPassReverse /admin/ http://${MARGE_IP_ADDRESS}:80/admin/
+    ProxyPass / http://${MARGE_IP_ADDRESS}:80/
+    ProxyPassReverse / http://${MARGE_IP_ADDRESS}:80/
+
+    RewriteEngine On
+    RewriteRule ^/$ /admin [R]
 </VirtualHost>
 
 # Virtual Host for Grafana.
