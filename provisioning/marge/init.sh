@@ -117,7 +117,7 @@ if ! id prometheus >/dev/null 2>&1; then
         cut -d '"' -f 4 | \
         wget -qi -
 
-    tar -xzf prometheus-*.linux-amd64.tar.gz
+    tar -xzf prometheus-*.linux-arm64.tar.gz
     cp -r prometheus-*/{prometheus,promtool} /usr/local/bin/
     cp -r prometheus-*/{consoles,console_libraries,prometheus.yml} /etc/prometheus/
 
@@ -140,7 +140,7 @@ if ! id prometheus >/dev/null 2>&1; then
         cut -d '"' -f 4 | \
         wget -qi -
 
-    tar -xzf node_exporter-*.linux-amd64.tar.gz
+    tar -xzf node_exporter-*.linux-arm64.tar.gz
     cp -r node_exporter-*/* /var/lib/prometheus/node_exporter/
 
     chown -R prometheus:prometheus /var/lib/prometheus/node_exporter
@@ -153,8 +153,8 @@ if ! id prometheus >/dev/null 2>&1; then
     systemctl daemon-reload
     systemctl enable --now node_exporter
 
-    rm -rf prometheus-*.linux-amd64.tar.gz \
-        node_exporter-*.linux-amd64.tar.gz \
+    rm -rf prometheus-*.linux-arm64.tar.gz \
+        node_exporter-*.linux-arm64.tar.gz \
         prometheus-* \
         node_exporter-*
 fi
