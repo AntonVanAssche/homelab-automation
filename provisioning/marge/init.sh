@@ -287,7 +287,7 @@ dnf install -y \
     python3-pip \
     python3-pillow \
     python3-spidev \
-    pigpio
+    python3-pigpio
 
 dnf install -y ../../rockpi-sata/pkgs/*.rpm
 
