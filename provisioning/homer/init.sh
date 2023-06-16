@@ -31,6 +31,7 @@ dnf install -y \
     vim-enhanced \
     tree \
     jq \
+    patch \
     httpd \
     mod_ssl \
     firewalld
