@@ -1,5 +1,5 @@
 --- sshd_config	2023-06-16 13:14:14.358835785 +0200
-+++ sshd_config.original	2023-06-16 11:22:27.994162493 +0200
++++ sshd_config.orig	2023-06-16 13:13:17.154367967 +0200
 @@ -37,7 +37,7 @@
  # Authentication:
  
@@ -18,15 +18,6 @@
  #PermitEmptyPasswords no
  
  # Change to no to disable s/key passwords
-@@ -91,7 +91,7 @@
- # If you just want the PAM account and session checks to run without
- # PAM authentication, then enable this but set PasswordAuthentication
- # and KbdInteractiveAuthentication to 'no'.
--# WARNING: 'UsePAM no' is not supported in Fedora and may cause several
-+# WARNING: 'UsePAM no' is not supported in RHEL and may cause several
- # problems.
- #UsePAM no
- 
 @@ -117,7 +117,7 @@
  #VersionAddendum none
  
