@@ -1,158 +1,110 @@
---- sshd_config	2023-06-13 19:50:37.843887989 +0200
-+++ sshd_config	2023-06-13 19:52:41.440862803 +0200
-@@ -1,23 +1,33 @@
--#	$OpenBSD: sshd_config,v 1.104 2021/07/02 05:11:21 dtucker Exp $
-+# $OpenBSD: sshd_config,v 1.104 2021/07/02 05:11:21 dtucker Exp $
-+
-+# This is the sshd server system-wide configuration file. See
+--- sshd_config.orig	2023-06-16 11:17:29.564837699 +0200
++++ sshd_config	2023-06-16 11:23:19.834545054 +0200
+@@ -1,33 +1,23 @@
+-# $OpenBSD: sshd_config,v 1.104 2021/07/02 05:11:21 dtucker Exp $
+-
+-# This is the sshd server system-wide configuration file. See
++#	$OpenBSD: sshd_config,v 1.104 2021/07/02 05:11:21 dtucker Exp $
  
--# This is the sshd server system-wide configuration file.  See
++# This is the sshd server system-wide configuration file.  See
  # sshd_config(5) for more information.
  
  # This sshd was compiled with PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
  
  # The strategy used for options in the default sshd_config shipped with
-+
+-
  # OpenSSH is to specify options with their default value where
--# possible, but leave them commented.  Uncommented options override the
-+
-+# possible, but leave them commented. Uncommented options override the
-+
+-
+-# possible, but leave them commented. Uncommented options override the
+-
++# possible, but leave them commented.  Uncommented options override the
  # default value.
  
--# To modify the system-wide sshd configuration, create a  *.conf  file under
--#  /etc/ssh/sshd_config.d/  which will be automatically included below
--Include /etc/ssh/sshd_config.d/*.conf
-+# To modify the system-wide sshd configuration, create a \*.conf file under
-+
-+# /etc/ssh/sshd_config.d/ which will be automatically included below
-+
-+Include /etc/ssh/sshd_config.d/\*.conf
+-# To modify the system-wide sshd configuration, create a \*.conf file under
+-
+-# /etc/ssh/sshd_config.d/ which will be automatically included below
+-
+-Include /etc/ssh/sshd_config.d/\*.conf
++# To modify the system-wide sshd configuration, create a  *.conf  file under
++#  /etc/ssh/sshd_config.d/  which will be automatically included below
++Include /etc/ssh/sshd_config.d/*.conf
  
  # If you want to change the port on a SELinux system, you have to tell
-+
+-
  # SELinux about this change.
-+
+-
  # semanage port -a -t ssh_port_t -p tcp #PORTNUMBER
-+
+-
  #
-+
+-
  #Port 22
  #AddressFamily any
  #ListenAddress 0.0.0.0
-@@ -28,16 +38,18 @@
- #HostKey /etc/ssh/ssh_host_ed25519_key
- 
- # Ciphers and keying
-+
- #RekeyLimit default none
- 
- # Logging
-+
- #SyslogFacility AUTH
- #LogLevel INFO
- 
+@@ -47,7 +37,7 @@
  # Authentication:
  
  #LoginGraceTime 2m
--#PermitRootLogin prohibit-password
+-PermitRootLogin yes
 +PermitRootLogin no
  #StrictModes yes
  #MaxAuthTries 6
  #MaxSessions 10
-@@ -56,21 +68,30 @@
- #AuthorizedKeysCommandUser nobody
- 
- # For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
-+
- #HostbasedAuthentication no
-+
- # Change to yes if you don't trust ~/.ssh/known_hosts for
-+
- # HostbasedAuthentication
-+
- #IgnoreUserKnownHosts no
-+
- # Don't read the user's ~/.rhosts and ~/.shosts files
-+
+@@ -72,7 +62,7 @@
  #IgnoreRhosts yes
  
  # To disable tunneled clear text passwords, change to no here!
--#PasswordAuthentication yes
-+
+-PasswordAuthentication yes
 +PasswordAuthentication no
  #PermitEmptyPasswords no
  
  # Change to no to disable s/key passwords
-+
- #KbdInteractiveAuthentication yes
- 
- # Kerberos options
-+
- #KerberosAuthentication no
- #KerberosOrLocalPasswd yes
- #KerberosTicketCleanup yes
-@@ -78,6 +99,7 @@
+@@ -86,7 +76,6 @@
  #KerberosUseKuserok yes
  
  # GSSAPI options
-+
+-
  #GSSAPIAuthentication no
  #GSSAPICleanupCredentials yes
  #GSSAPIStrictAcceptorCheck yes
-@@ -85,16 +107,27 @@
- #GSSAPIEnablek5users no
- 
+@@ -96,11 +85,11 @@
  # Set this to 'yes' to enable PAM authentication, account processing,
-+
  # and session processing. If this is enabled, PAM authentication will
-+
  # be allowed through the KbdInteractiveAuthentication and
--# PasswordAuthentication.  Depending on your PAM configuration,
-+
-+# PasswordAuthentication. Depending on your PAM configuration,
-+
+-PasswordAuthentication yes
++# PasswordAuthentication.  Depending on your PAM configuration,
  # PAM authentication via KbdInteractiveAuthentication may bypass
-+
- # the setting of "PermitRootLogin without-password".
-+
+-PermitRootLogin yes
++# the setting of "PermitRootLogin without-password".
  # If you just want the PAM account and session checks to run without
-+
- # PAM authentication, then enable this but set PasswordAuthentication
-+
+-PasswordAuthentication yes
++# PAM authentication, then enable this but set PasswordAuthentication
  # and KbdInteractiveAuthentication to 'no'.
-+
  # WARNING: 'UsePAM no' is not supported in RHEL and may cause several
-+
  # problems.
-+
- #UsePAM no
- 
- #AllowAgentForwarding yes
-@@ -119,14 +152,21 @@
+@@ -128,21 +117,14 @@
  #VersionAddendum none
  
  # no default banner path
-+
+-
  #Banner none
  
  # override default of no subsystems
--Subsystem	sftp	/usr/libexec/openssh/sftp-server
-+
-+Subsystem sftp /usr/libexec/openssh/sftp-server
+-
+-Subsystem sftp /usr/libexec/openssh/sftp-server
++Subsystem	sftp	/usr/libexec/openssh/sftp-server
  
  # Example of overriding settings on a per-user basis
-+
+-
  #Match User anoncvs
--#	X11Forwarding no
--#	AllowTcpForwarding no
--#	PermitTTY no
--#	ForceCommand cvs server
-+
-+# X11Forwarding no
-+
-+# AllowTcpForwarding no
-+
-+# PermitTTY no
-+
-+# ForceCommand cvs server
+-
+-# X11Forwarding no
+-
+-# AllowTcpForwarding no
+-
+-# PermitTTY no
+-
+-# ForceCommand cvs server
++#	X11Forwarding no
++#	AllowTcpForwarding no
++#	PermitTTY no
++#	ForceCommand cvs server
