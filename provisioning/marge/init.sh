@@ -29,8 +29,6 @@ dnf install -y \
     tree \
     jq \
     patch \
-    epel-release \
-    elrepo-release \
     mdadm
 
 # Enable essential services.

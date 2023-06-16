@@ -28,8 +28,6 @@ dnf install -y \
     vim-enhanced \
     tree \
     jq \
-    patch \
-    epel-release \
     httpd \
     mod_ssl
 
