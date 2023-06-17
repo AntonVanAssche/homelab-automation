@@ -5,151 +5,75 @@ set -o nounset # Abort on unbound variable.
 set -o pipefail # Don't hide errors within pipes.
 # set -o xtrace   # Enable for debugging.
 
-# Source the ENV variables.
-. ./.env
+declare -r DISK_UUID="0d8df2a0-1ff4-4bb8-b155-f8d91efd9ebf"
 
-# Ensure that SELinux is active.
-if [[ "$(getenforce)" != 'Enforcing' ]]; then
-    setenforce 1
-
-    # Change the SELinux mode to enforcing.
-    sed -i 's/SELINUX=.*/SELINUX=enforcing/' /etc/selinux/config
+if grep "${DISK_UUID}" /etc/fstab; then
+    info "External drive already mounted."
+else
+    warn "External drive not mounted. Mounting now..."
+    mkdir -p /mnt
+    printf 'UUID=%s  /mnt		ext4	defaults	0	0' \
+        "${DISK_UUID}" >> /etc/fstab
+    mount -a || \
+        error "Failed to mount external drive."
 fi
 
-# Disable the root account.
-usermod -s /usr/sbin/nologin root
-
-# Optimize the DNF configuration.
-cp -r ./files/dnf/dnf.conf /etc/dnf/dnf.conf
-
-# Update the system.
-dnf update -y
 
 # Install essential packages.
-dnf install -y \
-    git \
-    vim-enhanced \
-    tree \
-    jq \
-    patch \
-    httpd \
-    mod_ssl \
-    firewalld
+apt install -y \
+    apache2 \
+    mod_ssl
 
-# Enable essential services.
-systemctl enable --now firewalld
-
-####################
-# Network Settings #
-####################
-
-# Configure the static hostname.
-hostnamectl set-hostname "${HOST_NAME}"
-
-# Configure the static IP address.
-nmcli connection modify "${NETWORK_INTERFACE}" ipv4.addresses "${HOMER_IP_ADDRESS}/${SUBNET_MASK_CIDR}"
-nmcli connection modify "${NETWORK_INTERFACE}" ipv4.gateway "${DEFAULT_GATEWAY}"
-nmcli connection modify "${NETWORK_INTERFACE}" ipv4.dns "${DNS_SERVER}"
-nmcli connection modify "${NETWORK_INTERFACE}" ipv4.method manual
-
-# Restart the network service.
-systemctl restart NetworkManager
-
-# Configure the timezone.
-timedatectl set-timezone "${TIMEZONE}"
-
-#######
-# SSH #
-#######
-
-patch /etc/ssh/sshd_config < ./files/patches/sshd_config.patch
-cp -r ./files/motd /etc/profile.d/motd.sh
-cp -r ./files/banner /etc/banner
-
-############
-# Firewall #
-############
-
-firewall-cmd --add-service=http --permanent
-firewall-cmd --add-service=https --permanent
-firewall-cmd --add-service=ssh --permanent
-firewall-cmd --add-service=samba --permanent
+systemctl enable --now apache2
 
 firewall-cmd --add-port=3000/tcp --permanent
 firewall-cmd --add-port=8096/tcp --permanent
-firewall-cmd --add-port=9100/tcp --permanent
-firewall-cmd --add-port=9200/tcp --permanent
 firewall-cmd --add-port=9300/tcp --permanent
 
 firewall-cmd --add-port=51413/udp --permanent
-firewall-cmd --add-port=51820/udp --permanent
 
 firewall-cmd --reload
 
 # Hide sensitive server information.
-if [[ ! -d "/etc/httpd/conf.d" ]]; then
-    mkdir -p /etc/httpd/conf.d
+if [[ ! -d "/etc/apache2/conf.d" ]]; then
+    mkdir -p /etc/apache2/conf.d
 fi
-
-cat << EOF > /etc/httpd/conf.d/security.conf
-ServerTokens Prod
-ServerSignature Off
-EOF
-
-# Create the user account.
-if ! id "${USER_NAME}" &>/dev/null; then
-    useradd -m -s /bin/bash "${USER_NAME}"
-    usermod -aG wheel "${USER_NAME}"
-    printf '%s' "${USER_PASSWORD}" | passwd "${USER_NAME}" --stdin
-fi
-
-############
-# Fail2Ban #
-############
-
-dnf install -y \
-    fail2ban\
-    fail2ban-firewalld
-
-systemctl enable --now fail2ban
-
-cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
-patch /etc/fail2ban/jail.local < ./files/patches/jail.local.patch
 
 ########################
 # Apache Reverse Proxy #
 ########################
 
 # Generate a self-signed certificate.
-key_location="/etc/httpd/conf/ssl.key/${SERVER_DOMAIN}.key"
-crt_location="/etc/httpd/conf/ssl.key/${SERVER_DOMAIN}.crt"
+key_location="/etc/apache2/conf/ssl.key/${SERVER_DOMAIN}.key"
+crt_location="/etc/apache2/conf/ssl.key/${SERVER_DOMAIN}.crt"
 
 [[ -f "${key_location}" ]] && rm -f "${key_location}"
 [[ -f "${crt_location}" ]] && rm -f "${crt_location}"
 
-mkdir -p /etc/httpd/conf/ssl.key
+mkdir -p /etc/apache2/conf/ssl.key
 openssl req -newkey rsa:2048 -nodes -keyout "${key_location}" \
     -x509 -days 3650 -out "${crt_location}" \
     -subj "/C=BE/ST=Brussels/L=Brussels/O=Homer/OU=IT Department/CN=${SERVER_DOMAIN}"
 
-ssl_config_location="/etc/httpd/conf.d/ssl.conf"
+ssl_config_location="/etc/apache2/conf.d/ssl.conf"
 # Set the certificate file locations to the correct locations.
 [[ -f "${ssl_config_location}" ]] && \
     sed -i "s,SSLCertificateFile /etc/pki/tls/certs/localhost.crt,SSLCertificateFile ${crt_location},g" "${ssl_config_location}"
 [[ -f "${ssl_config_location}" ]] && \
     sed -i "s,SSLCertificateKeyFile /etc/pki/tls/private/localhost.key,SSLCertificateKeyFile ${key_location},g" "${ssl_config_location}"
 
-# Set SeLinux to allow httpd to write to the files directory.
-setsebool -P httpd_anon_write 1
+# Set SeLinux to allow apache2 to write to the files directory.
+setsebool -P apache2_anon_write 1
 
-# Write modules to load to the httpd.conf file.
-cat << EOF >> /etc/httpd/conf/httpd.conf
-LoadModule ssl_module /usr/lib64/apache2-prefork/mod_ssl.so
-LoadModule proxy_module modules/proxy.so
-LoadModule proxy_http_module modules/proxy_http
-EOF
+# Enable the required Apache modules.
+a2emod proxy
+a2enmod proxy_http
+a2enmod ssl
 
-cat << EOF > /etc/httpd/conf.d/reverse-proxy-http.conf
+# Disable the default Apache site.
+a2dissite 000-default.conf
+
+cat << EOF > /etc/apache2/sites-available/reverse-proxy-http.conf
 # Redirect all http traffic to https.
 <VirtualHost *:80>
     ServerName ${SERVER_DOMAIN}
@@ -163,7 +87,7 @@ cat << EOF > /etc/httpd/conf.d/reverse-proxy-http.conf
 </VirtualHost>
 EOF
 
-cat << EOF > /etc/httpd/conf.d/reverse-proxy-https.conf
+cat << EOF > /etc/apache2/sites-available/reverse-proxy-https.conf
 # Virtual Host for Pi-hole.
 <VirtualHost *:443>
     ServerName pihole.${SERVER_DOMAIN}
@@ -241,27 +165,56 @@ cat << EOF > /etc/httpd/conf.d/reverse-proxy-https.conf
     # If authentication is required, you can add the following line
     ProxyPassReverseCookieDomain ${MARGE_IP_ADDRESS} nas.${SERVER_DOMAIN}
 </VirtualHost>
+
+# Virtual Host for default website.
+<VirtualHost *:443>
+    ServerName ${SERVER_DOMAIN}
+    ServerAdmin webmaster@${SERVER_DOMAIN}
+    DocumentRoot /var/www/html
+
+    SSLEngine on
+    SSLCertificateFile ${crt_location}
+    SSLCertificateKeyFile ${key_location}
+
+    SSLEngine on
+    SSLHonorCipherOrder off
+    Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"
+
+    ProxyPreserveHost On
+    ProxyRequests Off
+    ProxyPass / http://127.0.0.1:8080/
+    ProxyPassReverse / http://127.0.0.1:8080/
 EOF
 
-# Set SeLinux to allow httpd to connect to the network.
-# This fixes the 503: Service Unavailable error.
-setsebool -P httpd_can_network_connect 1
+# Enable the reverse proxy sites.
+a2ensite reverse-proxy-http.conf
+a2ensite reverse-proxy-https.conf
 
-# Restart the httpd service.
-systemctl restart httpd
+# Set SeLinux to allow apache2 to connect to the network.
+# This fixes the 503: Service Unavailable error.
+setsebool -P apache2_can_network_connect 1
+
+# Restart the apache2 service.
+systemctl restart apache2
 
 ###########
 # Grafana #
 ###########
 
-cp "files/yum/repos/grafana.repo" /etc/yum.repos.d/grafana.repo
-dnf install -y grafana
+apt install -y apt-transport-https
+apt install -y software-properties-common wget
+wget -i -O /usr/share/keyrings/grafana.key https://apt.grafana.com/gpg.key
+
+echo "deb [signed-by=/usr/share/keyrings/grafana.key] https://apt.grafana.com stable main" | \
+    tee -a /etc/apt/sources.list.d/grafana.list
+
+apt update
+apt install -y grafana
 
 systemctl daemon-reload
 systemctl enable --now grafana-server
 
 # Generate a API key for the admin user.
-command -v jq >/dev/null 2>&1 || dnf install -y jq
 grafana_api_key=$(curl -s -X POST -H "Content-Type: application/json" \
     -d '{"name":"vagrant","role":"Admin"}' \
     http://admin:admin@localhost:3000/api/auth/keys | jq -r '.key')
@@ -328,72 +281,11 @@ curl -S -X DELETE -H "Content-Type: application/json" \
     -d '{"name":"vagrant","role":"Admin"}' \
     http://admin:admin@localhost:3000/api/auth/keys/1
 
-############################
-# Promethues Node Exporter #
-############################
-
-if ! id prometheus >/dev/null 2>&1; then
-    groupadd --system prometheus
-    useradd -s /sbin/nologin --system -g prometheus prometheus
-
-    mkdir -p /var/lib/prometheus
-    mkdir -p /etc/prometheus/{rules,rules.d,files_sd}
-
-    curl -s https://api.github.com/repos/prometheus/prometheus/releases/latest | \
-        grep browser_download_url | \
-        grep linux-arm64 | \
-        cut -d '"' -f 4 | \
-        wget -qi -
-
-    tar -xzf prometheus-*.linux-arm64.tar.gz
-    cp -r prometheus-*/{prometheus,promtool} /usr/local/bin/
-    cp -r prometheus-*/{consoles,console_libraries,prometheus.yml} /etc/prometheus/
-
-    chown -R prometheus:prometheus /etc/prometheus
-    chown -R prometheus:prometheus /var/lib/prometheus
-    chmod -R 775 /var/lib/prometheus
-
-    cp "files/prometheus/prometheus.yml" /etc/prometheus/prometheus.yml
-
-    cp "files/systemd/prometheus.service" /etc/systemd/system/prometheus.service
-
-    systemctl daemon-reload
-    systemctl enable --now prometheus
-
-    mkdir -p /var/lib/prometheus/node_exporter
-
-    curl -s https://api.github.com/repos/prometheus/node_exporter/releases/latest | \
-        grep browser_download_url | \
-        grep linux-arm64 | \
-        cut -d '"' -f 4 | \
-        wget -qi -
-
-    tar -xzf node_exporter-*.linux-arm64.tar.gz
-    cp -r node_exporter-*/* /var/lib/prometheus/node_exporter/
-
-    chown -R prometheus:prometheus /var/lib/prometheus/node_exporter
-    chmod -R 775 /var/lib/prometheus/node_exporter
-
-    cp -r /var/lib/prometheus/node_exporter/node_exporter /usr/local/bin/node_exporter
-
-    cp "files/systemd/node_exporter.service" /etc/systemd/system/node_exporter.service
-
-    systemctl daemon-reload
-    systemctl enable --now node_exporter
-
-    rm -rf prometheus-*.linux-arm64.tar.gz \
-        node_exporter-*.linux-arm64.tar.gz \
-        prometheus-* \
-        node_exporter-*
-fi
-
 ###################
 # Podman & Docker #
 ###################
 
-dnf install -y \
-    podman \
-    podman-docker
+apt install -y podman
 
 mkdir -p /var/lib/podman/volumes/configs/emby/config \
     /mnt/series \
