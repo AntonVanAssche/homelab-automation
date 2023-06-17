@@ -76,6 +76,8 @@ cat << EOF > /etc/apache2/sites-available/reverse-proxy-http.conf
     ServerName ${SERVER_DOMAIN}
     ServerAdmin webmaster@${SERVER_DOMAIN}
     DocumentRoot /var/www/html
+</VirtualHost>
+EOF
 
     # Redirect HTTP traffic to HTTPS equivalent
     RewriteEngine On
