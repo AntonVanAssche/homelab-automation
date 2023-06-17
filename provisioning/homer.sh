@@ -79,11 +79,11 @@ cat << EOF > /etc/apache2/sites-available/reverse-proxy-http.conf
 </VirtualHost>
 EOF
 
-    # Redirect HTTP traffic to HTTPS equivalent
-    RewriteEngine On
-    RewriteCond %{HTTPS} off
-    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
-</VirtualHost>
+# Redirect all http traffic to https.
+cat << EOF > /var/www/html/.htaccess
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
 EOF
 
 cat << EOF > /etc/apache2/sites-available/reverse-proxy-https.conf
@@ -97,7 +97,6 @@ cat << EOF > /etc/apache2/sites-available/reverse-proxy-https.conf
 
     SSLEngine on
     SSLHonorCipherOrder off
-    Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"
 
     ProxyPreserveHost On
     ProxyRequests Off
@@ -177,12 +176,12 @@ cat << EOF > /etc/apache2/sites-available/reverse-proxy-https.conf
 
     SSLEngine on
     SSLHonorCipherOrder off
-    Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"
 
     ProxyPreserveHost On
     ProxyRequests Off
     ProxyPass / http://127.0.0.1:8080/
     ProxyPassReverse / http://127.0.0.1:8080/
+</VirtualHost>
 EOF
 
 # Enable the reverse proxy sites.
