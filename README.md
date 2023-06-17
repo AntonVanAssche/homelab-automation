@@ -128,6 +128,7 @@ Simply navigate to the `rockpi-sata` directory and run the `install.sh` script.
 ```console
 # cd rockpi-sata
 # ./install.sh
+# systemctl reboot
 ```
 
 After the installation of the SATA HAT, navigate back to the `provisioning` directory and run the `init.sh` script.
