@@ -156,7 +156,8 @@ systemctl enable --now mnt-nas.mount
 
 apt install -y samba
 
-smbpasswd -a "${USER_NAME}"
+{ printf '%s\n' "${USER_PASSWORD}"; printf '%s\n' "${USER_PASSWORD}"; } | \
+    smbpasswd -a "${USER_NAME}"
 
 info "Backing up the default Samba configuration file."
 cp /etc/samba/smb.conf /etc/samba/smb.conf.bak
