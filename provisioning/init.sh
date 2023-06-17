@@ -117,35 +117,30 @@ fi
 info "Configuring the static hostname (${HOST_NAME})"
 hostnamectl set-hostname "${HOST_NAME}"
 
-if [[ "${HOST_NAME}" == "homer" ]]; then
-    info "Configuring the static IP address"
-    info "The following settings will be applied:"
-    info "  IP Address: ${HOMER_IP_ADDRESS}/${SUBNET_MASK_CIDR}"
-    info "  Gateway: ${DEFAULT_GATEWAY}"
-    info "  DNS Server: ${DNS_SERVER}"
+case "${HOST_NAME}" in
+    homer)
+        declare -r IP_ADDRESS="${HOMER_IP_ADDRESS}"
+        ;;
+    marge)
+        declare -r IP_ADDRESS="${MARGE_IP_ADDRESS}"
+        ;;
+    *)
+        error "Unknown host: ${HOST_NAME}"
+        ;;
+esac
 
-    cat << EOF > /etc/dhcpcd.conf
-interface eth0
-static ip_address=${HOMER_IP_ADDRESS}/${SUBNET_MASK_CIDR}
-static routers=${DEFAULT_GATEWAY}
-static domain_name_servers=1.1.1.1 1.0.0.1
-EOF
-elif [[ "${HOST_NAME}" == "marge" ]]; then
-    info "Configuring the static IP address"
-    info "The following settings will be applied:"
-    info "  IP Address: ${MARGE_IP_ADDRESS}/${SUBNET_MASK_CIDR}"
-    info "  Gateway: ${DEFAULT_GATEWAY}"
-    info "  DNS Server: ${DNS_SERVER}"
+info "Configuring the static IP address"
+info "The following settings will be applied:"
+info "  IP Address: ${IP_ADDRESS}/${SUBNET_MASK_CIDR}"
+info "  Gateway: ${DEFAULT_GATEWAY}"
+info "  DNS Server: ${DNS_SERVER}"
 
-    cat << EOF > /etc/dhcpcd.conf
+cat << EOF > /etc/dhcpcd.conf
 interface eth0
 static ip_address=${MARGE_IP_ADDRESS}/${SUBNET_MASK_CIDR}
 static routers=${DEFAULT_GATEWAY}
 static domain_name_servers=1.1.1.1 1.0.0.1
 EOF
-else
-    error "Unknown host: ${HOST_NAME}"
-fi
 
 # Restart the network service.
 systemctl restart dhcpd
