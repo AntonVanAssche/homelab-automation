@@ -197,7 +197,7 @@ systemctl restart apache2
 
 apt install -y apt-transport-https
 apt install -y software-properties-common wget
-wget -i -O /usr/share/keyrings/grafana.key https://apt.grafana.com/gpg.key
+wget -O /usr/share/keyrings/grafana.key https://apt.grafana.com/gpg.key
 
 echo "deb [signed-by=/usr/share/keyrings/grafana.key] https://apt.grafana.com stable main" | \
     tee -a /etc/apt/sources.list.d/grafana.list
