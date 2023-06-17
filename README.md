@@ -25,14 +25,15 @@ The script will install and configure things like SELinux, firewalld, Podman and
 
 Originally, I was planning on using a RHEL-based distribution for the servers, such as Oracle Linux 9 or Fedora Server 38.
 But due to the lack of support for the Raxda Rock Pi SATA HAT, I had to switch to Debian Bullseye.
-I tried to get the SATA HAT working on Fedora Server 38, but I couldn't get it to work.
-Therefore, I had to switch to Debian Bullseye, which is a Debian-based distribution.
+I tried to get the SATA HAT working on Fedora Server 38 by packaging the drivers myself in a RPM package, which successfully installed the drivers.
+But made me end up in the well beloved "Dependency Hell" and I couldn't get the drivers to work properly.
+For example, the GPIO drivers are packaged differently in Fedora Server 38 than in Debian Bullseye, which meant that I had to rewrite the SATA HAT drivers to get them to work with the GPIO drivers in Fedora Server 38.
 
 ## Server: Homer
 
 Homer serves primarily as a hometheater media server, hosting an Emby instance to provide media streaming capabilities. Emby is a media server application that allows for the streaming of media files to a wide range of devices.
 
-Besides Emby, Homer also hosts a transmission-daemon instance to enable torrenting capabilities. Transmission is a BitTorrent client that allows for the downloading and seeding of torrent files. It is configured to use a VPN connection to ensure that all torrent traffic is encrypted and secure.
+Besides Emby, Homer also hosts a transmission-daemon instance to enable torrenting capabilities. Transmission is a BitTorrent client that allows for the downloading and seeding of torrent files.
 
 Probably the most important feature of Homer is the Grafana instance that is hosted on it. Allowing me to monitor both Homer and Marge from a web interface. Both servers are monitored using Prometheus and Node Exporter. Dashboards are created using Grafana's API and are automatically provisioned using the provisioning script.
 
