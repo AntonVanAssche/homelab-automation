@@ -21,8 +21,7 @@ fi
 
 # Install essential packages.
 apt install -y \
-    apache2 \
-    mod_ssl
+    apache2
 
 systemctl enable --now apache2
 
@@ -62,13 +61,11 @@ ssl_config_location="/etc/apache2/conf.d/ssl.conf"
 [[ -f "${ssl_config_location}" ]] && \
     sed -i "s,SSLCertificateKeyFile /etc/pki/tls/private/localhost.key,SSLCertificateKeyFile ${key_location},g" "${ssl_config_location}"
 
-# Set SeLinux to allow apache2 to write to the files directory.
-setsebool -P apache2_anon_write 1
-
 # Enable the required Apache modules.
-a2emod proxy
+a2enmod proxy
 a2enmod proxy_http
 a2enmod ssl
+a2enmod rewrite
 
 # Disable the default Apache site.
 a2dissite 000-default.conf
@@ -189,10 +186,6 @@ EOF
 # Enable the reverse proxy sites.
 a2ensite reverse-proxy-http.conf
 a2ensite reverse-proxy-https.conf
-
-# Set SeLinux to allow apache2 to connect to the network.
-# This fixes the 503: Service Unavailable error.
-setsebool -P apache2_can_network_connect 1
 
 # Restart the apache2 service.
 systemctl restart apache2
