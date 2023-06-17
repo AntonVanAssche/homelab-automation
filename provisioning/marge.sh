@@ -17,21 +17,21 @@ mkdir -p /var/lib/podman/volumes/configs/{pihole,dnsmasq.d}
 # This port is used by systemd-resolved.
 systemctl disable --now systemd-resolved
 unlink /etc/resolv.conf
-systemctl restart NetworkManager
+ifdown "${NETWORK_INTERFACE}" && ifup "${NETWORK_INTERFACE}"
 
 # We have to wait for the network to be up.
 sleep 5
-
-podman run -d \
-    --name pihole \
-    --env TZ="${TIMEZONE}" \
-    --env WEBPASSWORD="${PIHOLE_PASSWORD}" \
-    --volume /var/lib/podman/volumes/configs/pihole:/etc/pihole:Z \
-    --volume /var/lib/podman/volumes/configs/dnsmasq.d:/etc/dnsmasq.d:Z \
-    --publish 53:53/tcp \
-    --publish 53:53/udp \
-    --publish 80:80/tcp \
-    docker.io/pihole/pihole:latest
+podman images -a --format "{{.Names}}" &> /dev/null || \
+    podman run -d \
+        --name pihole \
+        --env TZ="${TIMEZONE}" \
+        --env WEBPASSWORD="${PIHOLE_PASSWORD}" \
+        --volume /var/lib/podman/volumes/configs/pihole:/etc/pihole:Z \
+        --volume /var/lib/podman/volumes/configs/dnsmasq.d:/etc/dnsmasq.d:Z \
+        --publish 53:53/tcp \
+        --publish 53:53/udp \
+        --publish 80:80/tcp \
+        docker.io/pihole/pihole:latest
 
 podman generate systemd --new --name pihole > /etc/systemd/system/pihole.service
 systemctl daemon-reload
@@ -49,6 +49,7 @@ apt install -y \
 
 mkdir -p "/etc/wireguard/${HOSTNAME}"
 
+info "Enabling IP forwarding."
 [[ -f "/etc/sysctl.conf" ]] && \
     cat << EOF >> /etc/sysctl.conf
 net.ipv4.ip_forward = 1
@@ -56,6 +57,7 @@ EOF
 
 sysctl -p
 
+info "Generating Wireguard keys."
 wg genkey | \
     tee "/etc/wireguard/${HOSTNAME}.private.key" | \
     wg pubkey > "/etc/wireguard/${HOSTNAME}.public.key"
@@ -63,6 +65,7 @@ wg genkey | \
 chmod 600 "/etc/wireguard/${HOSTNAME}.private.key" \
     "/etc/wireguard/${HOSTNAME}.public.key"
 
+info "Generating Wireguard configuration file."
 cat << EOF > /etc/wireguard/wg0.conf
 [Interface]
 PrivateKey = $(cat "/etc/wireguard/${HOSTNAME}.private.key")
@@ -82,7 +85,9 @@ declare -a CLIENTS=(
 
 declare -i i=2
 
+info "Generating Wireguard clients"
 for client_name in "${CLIENTS[@]}"; do
+    info "Generating Wireguard keys for client ${client_name}."
     wg genkey | \
         tee "/etc/wireguard/clients/wg0-client-${client_name}.private.key" | \
         wg pubkey > "/etc/wireguard/clients/wg0-client-${client_name}.public.key"
@@ -92,6 +97,7 @@ for client_name in "${CLIENTS[@]}"; do
         "/etc/wireguard/clients/wg0-client-${client_name}.public.key" \
         "/etc/wireguard/clients/wg0-client-${client_name}.psk"
     
+    info "Generating Wireguard configuration file for client ${client_name}."
     cat << EOF > "/etc/wireguard/clients/wg0-client-${client_name}.conf"
 [Interface]
 PrivateKey = $(cat "/etc/wireguard/clients/wg0-client-${client_name}.private.key")
@@ -106,6 +112,7 @@ AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 30
 EOF
 
+    info "Adding client ${client_name} to Wireguard configuration file."
     cat << EOF >> /etc/wireguard/wg0.conf
 
 # BEGIN ${client_name}
@@ -117,7 +124,7 @@ AllowedIPs = 10.82.146.${i}/32
 EOF
 
     # Generate QR codes and save them to PNG files.
-    printf 'Client %s:\n' "${client_name}"
+    info "Generating QR codes for client ${client_name}."
     qrencode -t ansiutf8 < "/etc/wireguard/clients/wg0-client-${client_name}.conf"
     qrencode -t png -o "/etc/wireguard/clients/wg0-client-${client_name}.png" < "/etc/wireguard/clients/wg0-client-${client_name}.conf"
 
@@ -130,12 +137,15 @@ systemctl restart wg-quick@wg0
 # RAID 5 #
 ##########
 
+info "Scanning for RAID devices."
 mdadm --assemble --scan --verbose
 mdadm --detail --scan | tee /etc/mdadm.conf
 
+info "Configuring mount point for RAID 5 array."
 mkdir -p /mnt/nas
 chown -R "${USER_NAME}":"${USER_NAME}" /mnt/nas
 
+info "Mounting RAID 5 array."
 cp -r files/systemd/mnt-nas.mount /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable --now mnt-nas.mount
