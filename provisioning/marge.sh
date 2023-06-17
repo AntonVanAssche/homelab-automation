@@ -165,4 +165,4 @@ cp /etc/samba/smb.conf /etc/samba/smb.conf.bak
 info "Patching the Samba configuration file."
 patch /etc/samba/smb.conf < ./files/patches/smb.conf.patch
 
-systemctl enable --now smb
+systemctl enable --now smbd
