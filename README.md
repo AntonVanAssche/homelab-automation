@@ -70,6 +70,8 @@ DNS_SERVER=                             # e.g. "1.1.1.1"
 
 # Host configuration
 HOST_NAME=                              # "homer" or "marge"
+USER_NAME=                              # e.g. "homer"
+USER_PASSWORD=                          # e.g. "password"
 
 # Timezone configuration
 TIMEZONE=                               # e.g. "Europe/Brussels"
@@ -96,6 +98,8 @@ DNS_SERVER=                             # e.g. "1.1.1.1"
 
 # Host configuration
 HOST_NAME=                              # "homer" or "marge"
+USER_NAME=                              # e.g. "marge"
+USER_PASSWORD=                          # e.g. "password"
 
 # Timezone configuration
 TIMEZONE=                               # e.g. "Europe/Brussels"
