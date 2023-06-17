@@ -21,7 +21,7 @@ ifdown "${NETWORK_INTERFACE}" && ifup "${NETWORK_INTERFACE}"
 
 # We have to wait for the network to be up.
 sleep 5
-podman images -a --format "{{.Names}}" &> /dev/null || \
+podman images -a --format "{{.Names}}" | grep "pihole" &> /dev/null || \
     podman run -d \
         --name pihole \
         --env TZ="${TIMEZONE}" \
