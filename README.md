@@ -61,7 +61,7 @@ Homer requires the following environment variables to be set:
 
 ```bash
 # Network configuration
-NETWORK_INTERFACE=                      # e.g. "Wired connection 1"
+NETWORK_INTERFACE=                      # e.g. "eth0"
 HOMER_IP_ADDRESS=                       # e.g. "192.168.0.2"
 MARGE_IP_ADDRESS=                       # e.g. "192.168.0.3"
 SUBNET_MASK_CIDR=                       # e.g. "24"
@@ -89,7 +89,7 @@ Marge requires the following environment variables to be set:
 
 ```bash
 # Network configuration
-NETWORK_INTERFACE=                      # e.g. "Wired connection 1"
+NETWORK_INTERFACE=                      # e.g. "eth0"
 HOMER_IP_ADDRESS=                       # e.g. "192.168.0.2"
 MARGE_IP_ADDRESS=                       # e.g. "192.168.0.3"
 SUBNET_MASK_CIDR=                       # e.g. "24"
