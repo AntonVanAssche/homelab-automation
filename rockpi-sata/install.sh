@@ -81,7 +81,7 @@ pip_install() {
     TEMP_DIR="$(mktemp -d)"
     curl -sL "${SSD1306}" -o "${TEMP_ZIP}"
     unzip "${TEMP_ZIP}" -d "${TEMP_DIR}" > /dev/null
-    cd "${{TEMP_DIR}}/Adafruit_SSD1306-v1.6.2"
+    cd "${TEMP_DIR}/Adafruit_SSD1306-v1.6.2"
     python3 setup.py install && cd -
     rm -rf "${TEMP_ZIP}" "${TEMP_DIR}"
 }
