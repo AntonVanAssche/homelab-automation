@@ -1,6 +1,14 @@
 name: Shellcheck
 
-on: [push, pull_request]
+on:
+    push:
+        paths:
+            - "rockpi-srata/**"
+            - "provisioning/**"
+    pull_request:
+        paths:
+            - "rockpi-srata/**"
+            - "provisioning/**"
 
 jobs:
     build:
@@ -8,9 +16,13 @@ jobs:
 
         steps:
             - uses: actions/checkout@v1
-            - name: Run shellcheck.
+            - name: Run shellcheck on init scripts.
               run: |
                   shopt -s nullglob
-                  shellcheck rockpi-sata/build.sh
+                  shellcheck provisioning/init.sh --exclude=SC1091
                   shellcheck provisioning/homer/init.sh --exclude=SC1091
                   shellcheck provisioning/marge/init.sh --exclude=SC1091
+            - name: Run shellcheck on RockPi SATA install script.
+              run: |
+                  shopt -s nullglob
+                  shellcheck rockpi-sata/install.sh --exclude=SC1091
