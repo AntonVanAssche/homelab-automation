@@ -3,11 +3,11 @@ name: Shellcheck
 on:
     push:
         paths:
-            - "rockpi-srata/**"
+            - "rockpi-sata/**"
             - "provisioning/**"
     pull_request:
         paths:
-            - "rockpi-srata/**"
+            - "rockpi-sata/**"
             - "provisioning/**"
 
 jobs:
