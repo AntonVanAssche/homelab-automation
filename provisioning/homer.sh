@@ -10,7 +10,7 @@ declare -r DISK_UUID="0d8df2a0-1ff4-4bb8-b155-f8d91efd9ebf"
 if grep "${DISK_UUID}" /etc/fstab; then
     info "External drive already mounted."
 else
-    warn "External drive not mounted. Mounting now..."
+    warning "External drive not mounted. Mounting now..."
     mkdir -p /mnt
     printf 'UUID=%s  /mnt		ext4	defaults	0	0' \
         "${DISK_UUID}" >> /etc/fstab
