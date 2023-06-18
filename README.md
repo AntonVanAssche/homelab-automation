@@ -19,7 +19,9 @@
 The Homelab Project is a personal endeavor to create a small-scale, self-hosted infrastructure using two Raspberry Pi 4B devices.
 The project consists of two servers, named Homer and Marge, each serving different purposes within the homelab environment.
 Both servers run Debian Bullseye and are completely automated using Bash scripts.
-The script will install and configure things like SELinux, firewalld, Podman and server specific applications.
+The script will install and configure things like AppArmor, firewalld, Podman and server specific applications.
+And yes I know that firewalld isn't a normal choice for a debian based distribution, but I like it more than ufw, so deal with it 😁.
+Same goes for Podman, I just like it more than Docker, so I'm using it instead.
 
 ## Encountered Issues
 

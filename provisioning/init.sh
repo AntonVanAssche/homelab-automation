@@ -151,34 +151,21 @@ systemctl restart dhcpcd
 info "Configuring the timezone"
 timedatectl set-timezone "${TIMEZONE}"
 
-###########
-# SELinux #
-###########
+############
+# AppArmor #
+############
 
-info "Uninstalling AppArmor"
-systemctl disable --now apparmor || \
-    warning "AppArmor already stopped. Moving on."
-apt purge -y apparmor
+info "Installing AppArmor"
+apt install -y \
+    apparmor \
+    apparmor-utils
 
-command -v selinux-activate &> /dev/null || {
-    info "Installing SELinux"
-    apt install -y \
-        selinux-basics \
-        selinux-policy-default \
-        auditd
+info "Enabling AppArmor"
+systemctl enable --now apparmor
 
-    selinux-activate
-
-    # Ensure that SELinux is active.
-    if [[ "$(getenforce)" != 'Enforcing' ]]; then
-        setenforce 1
-
-        # Change the SELinux mode to enforcing.
-        sed -i 's/SELINUX=.*/SELINUX=enforcing/' /etc/selinux/config
-    fi
-
-    setsebool -P httpd_can_network_connect 1
-} || warning "SELinux is already installed and configured. Moving on."
+info "Make sure AppArmor is running on boot"
+[[ -f "/boot/cmdline.txt" ]] || \
+    sed -i '/^console/ s/$/  apparmor=1 security=apparmor/' /boot/cmdline.txt
 
 ############
 # Fail2Ban #
