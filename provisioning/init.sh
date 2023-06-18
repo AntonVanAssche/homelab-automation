@@ -139,7 +139,7 @@ cat << EOF > /etc/dhcpcd.conf
 interface eth0
 static ip_address=${MARGE_IP_ADDRESS}/${SUBNET_MASK_CIDR}
 static routers=${DEFAULT_GATEWAY}
-static domain_name_servers=1.1.1.1 1.0.0.1
+static domain_name_servers=${DNS_SERVER}
 EOF
 
 # Restart the network service.
