@@ -296,7 +296,8 @@ podman run -d \
     --volume /mnt/movies:/data/movies:Z \
     --volume /mnt/documentaries:/data/documentaries:Z \
     --publish 8096:8096 \
-    docker.io/emby/embyserver:latest
+    --device /dev/vchiq:/dev/vchiq \
+    docker.io/emby/embyserver_arm64v8:latest
 
 podman generate systemd --new --name emby > /etc/systemd/system/emby.service
 systemctl daemon-reload
