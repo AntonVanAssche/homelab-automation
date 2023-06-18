@@ -18,7 +18,7 @@
             }
         ]
     },
-    "description": "Prometheus node_exporter mdadm module dashboard. Per Server and per md view",
+    "description": "Prometheus-Marge node_exporter mdadm module dashboard. Per Server and per md view",
     "editable": true,
     "gnetId": 12768,
     "graphTooltip": 0,
@@ -28,7 +28,7 @@
     "panels": [
         {
             "collapsed": false,
-            "datasource": "Prometheus",
+            "datasource": "Prometheus-Marge",
             "fieldConfig": {
                 "defaults": {},
                 "overrides": []
@@ -47,7 +47,7 @@
         },
         {
             "cacheTimeout": null,
-            "datasource": "Prometheus",
+            "datasource": "Prometheus-Marge",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -137,7 +137,7 @@
         },
         {
             "cacheTimeout": null,
-            "datasource": "Prometheus",
+            "datasource": "Prometheus-Marge",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -227,7 +227,7 @@
         },
         {
             "cacheTimeout": null,
-            "datasource": "Prometheus",
+            "datasource": "Prometheus-Marge",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -294,7 +294,7 @@
         },
         {
             "cacheTimeout": null,
-            "datasource": "Prometheus",
+            "datasource": "Prometheus-Marge",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -369,7 +369,7 @@
         },
         {
             "cacheTimeout": null,
-            "datasource": "Prometheus",
+            "datasource": "Prometheus-Marge",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -435,7 +435,7 @@
         },
         {
             "collapsed": false,
-            "datasource": "Prometheus",
+            "datasource": "Prometheus-Marge",
             "fieldConfig": {
                 "defaults": {},
                 "overrides": []
@@ -454,7 +454,7 @@
         },
         {
             "cacheTimeout": null,
-            "datasource": "Prometheus",
+            "datasource": "Prometheus-Marge",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -545,7 +545,7 @@
         },
         {
             "cacheTimeout": null,
-            "datasource": "Prometheus",
+            "datasource": "Prometheus-Marge",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -635,7 +635,7 @@
         },
         {
             "cacheTimeout": null,
-            "datasource": "Prometheus",
+            "datasource": "Prometheus-Marge",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -710,7 +710,7 @@
         },
         {
             "cacheTimeout": null,
-            "datasource": "Prometheus",
+            "datasource": "Prometheus-Marge",
             "fieldConfig": {
                 "defaults": {
                     "mappings": [
@@ -787,7 +787,7 @@
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "Prometheus",
+            "datasource": "Prometheus-Marge",
             "fieldConfig": {
                 "defaults": {
                     "links": []
@@ -895,7 +895,7 @@
                     "text": "localhost:9100",
                     "value": "localhost:9100"
                 },
-                "datasource": "Prometheus",
+                "datasource": "Prometheus-Marge",
                 "definition": "",
                 "description": null,
                 "error": null,
@@ -907,7 +907,7 @@
                 "options": [],
                 "query": {
                     "query": "label_values(node_md_disks, instance)",
-                    "refId": "Prometheus-instance-Variable-Query"
+                    "refId": "Prometheus-Marge-instance-Variable-Query"
                 },
                 "refresh": 1,
                 "regex": "",
@@ -925,7 +925,7 @@
                     "text": "localhost",
                     "value": "localhost"
                 },
-                "datasource": "Prometheus",
+                "datasource": "Prometheus-Marge",
                 "definition": "",
                 "description": null,
                 "error": null,
@@ -937,7 +937,7 @@
                 "options": [],
                 "query": {
                     "query": "label_values(node_md_disks{instance=~\"$instance\"}, instance)",
-                    "refId": "Prometheus-host-Variable-Query"
+                    "refId": "Prometheus-Marge-host-Variable-Query"
                 },
                 "refresh": 1,
                 "regex": "/(.+):.*/",
@@ -955,7 +955,7 @@
                     "text": "md0",
                     "value": "md0"
                 },
-                "datasource": "Prometheus",
+                "datasource": "Prometheus-Marge",
                 "definition": "label_values(node_md_disks{instance=~\"$instance\"}, device)",
                 "description": null,
                 "error": null,
@@ -967,7 +967,7 @@
                 "options": [],
                 "query": {
                     "query": "label_values(node_md_disks{instance=~\"$instance\"}, device)",
-                    "refId": "Prometheus-md-Variable-Query"
+                    "refId": "Prometheus-Marge-md-Variable-Query"
                 },
                 "refresh": 1,
                 "regex": "",
