@@ -143,7 +143,7 @@ static domain_name_servers=${DNS_SERVER}
 EOF
 
 # Restart the network service.
-systemctl restart dhcpd
+systemctl restart dhcpcd
 
 info "Configuring the timezone"
 timedatectl set-timezone "${TIMEZONE}"
