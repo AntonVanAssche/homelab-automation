@@ -108,6 +108,9 @@ if [[ -f "/etc/ssh/sshd_config" ]]; then
         log "Restarting sshd service"
         systemctl restart sshd
     fi
+
+    # Disable default ssh greetings message.
+    :> /home/"${USER_NAME}"/.hushlogin
 fi
 
 ####################
