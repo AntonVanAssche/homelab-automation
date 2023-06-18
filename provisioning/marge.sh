@@ -11,6 +11,18 @@ set -o pipefail # Don't hide errors within pipes.
 
 apt install -y podman
 
+# Unbound DNS server.
+mkdir -p /var/lib/podman/volumes/configs/unbound
+
+podman images -a --format "{{.Names}}" | grep "unbound" &> /dev/null || \
+    podman run -d \
+        --name=unbound \
+        --publish 5353:53/tcp \
+        --publish 5353:53/udp \
+        --volume /var/lib/podman/volumes/configs/unbound:/etc/unbound:Z \
+        docker.io/klutchell/unbound:latest
+
+# Pi-hole DNS sinkhole.
 mkdir -p /var/lib/podman/volumes/configs/{pihole,dnsmasq.d}
 
 # Fix port 53 already bound error.
@@ -26,6 +38,8 @@ podman images -a --format "{{.Names}}" | grep "pihole" &> /dev/null || \
         --name pihole \
         --env TZ="${TIMEZONE}" \
         --env WEBPASSWORD="${PIHOLE_PASSWORD}" \
+        --env PIHOLE_DNS_="127.0.0.1#5353,8.8.8.8" \
+        --env DNSSEC=true \
         --volume /var/lib/podman/volumes/configs/pihole:/etc/pihole:Z \
         --volume /var/lib/podman/volumes/configs/dnsmasq.d:/etc/dnsmasq.d:Z \
         --publish 53:53/tcp \
@@ -102,7 +116,7 @@ for client_name in "${CLIENTS[@]}"; do
 [Interface]
 PrivateKey = $(cat "/etc/wireguard/clients/wg0-client-${client_name}.private.key")
 Address = 10.82.146.${i}/24
-DNS = ${DNS_SERVER}
+DNS = ${MARGE_IP_ADDRESS}
 
 [Peer]
 PublicKey = $(cat "/etc/wireguard/${HOSTNAME}.public.key")
