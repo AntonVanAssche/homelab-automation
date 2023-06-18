@@ -5,6 +5,19 @@ set -o nounset # Abort on unbound variable.
 set -o pipefail # Don't hide errors within pipes.
 # set -o xtrace   # Enable for debugging.
 
+############
+# Firewall #
+############
+
+firewall-cmd --add-service=http --permanent
+firewall-cmd --add-service=dns --permanent
+
+firewall-cmd --add-port=51820/udp --permanent
+
+firewall-cmd --permanent --zone=public --add-masquerade
+
+firewall-cmd --reload
+
 ###################
 # Podman & Docker #
 ###################
