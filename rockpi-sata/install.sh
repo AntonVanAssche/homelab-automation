@@ -172,3 +172,5 @@ main() {
     enable_services
     success "Installation completed."
 }
+
+main "${@}"
