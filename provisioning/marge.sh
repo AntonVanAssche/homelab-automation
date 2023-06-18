@@ -151,6 +151,9 @@ systemctl restart wg-quick@wg0
 # RAID 5 #
 ##########
 
+info "Installing mdadm."
+apt install -y mdadm
+
 info "Scanning for RAID devices."
 mdadm --assemble --scan --verbose
 mdadm --detail --scan | tee /etc/mdadm.conf
