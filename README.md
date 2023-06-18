@@ -31,23 +31,31 @@ For example, the GPIO drivers are packaged differently in Fedora Server 38 than 
 
 ## Server: Homer
 
-Homer serves primarily as a hometheater media server, hosting an Emby instance to provide media streaming capabilities. Emby is a media server application that allows for the streaming of media files to a wide range of devices.
+Emby takes the spotlight on Homer, functioning as the media streaming powerhouse. With Emby, I can effortlessly stream my media files to various devices throughout my home. It provides a seamless and enjoyable media experience, allowing me to access my favorite movies, TV shows, and documentaries with ease.
 
-Besides Emby, Homer also hosts a transmission-daemon instance to enable torrenting capabilities. Transmission is a BitTorrent client that allows for the downloading and seeding of torrent files.
+Torrenting capabilities are also integrated into Homer through its transmission-daemon instance. Transmission serves as a BitTorrent client, empowering me to download and seed torrent files efficiently. It adds another dimension of content acquisition to my media server setup.
 
-Probably the most important feature of Homer is the Grafana instance that is hosted on it. Allowing me to monitor both Homer and Marge from a web interface. Both servers are monitored using Prometheus and Node Exporter. Dashboards are created using Grafana's API and are automatically provisioned using the provisioning script.
+Additionally, Homer boasts an essential component: Grafana. This powerful tool enables me to monitor both Homer and Marge through an intuitive web interface. Thanks to Prometheus and Node Exporter, both servers are continuously monitored, providing valuable insights into their performance and health.
+
+To streamline the monitoring process, I've automated the creation of Grafana dashboards using Grafana's API. These dashboards are automatically provisioned using a dedicated provisioning script, ensuring that I have access to the most relevant and up-to-date information at all times.
+
+In summary, Homer is a multifaceted server that elevates my media streaming experience with Emby, empowers torrenting with Transmission, and facilitates comprehensive monitoring through Grafana, Prometheus, and Node Exporter. It serves as a central hub for all my media-related activities and ensures that my servers are running optimally and efficiently.
 
 ## Server: Marge
 
 <img src="./assets/rockpi-sata-kit.png" alt="img" align="right" width="25%">
 
-Marge is a dedicated Network-Attached Storage (NAS) server configured with a RAID 5 array using four SATA HDDs. It offers reliable data storage and access within the homelab environment. Samba, an open-source implementation of the Server Message Block (SMB) protocol, is installed on Marge to enable seamless file sharing and network integration.
+Marge is my dedicated Network-Attached Storage (NAS) server designed to provide secure data storage and advanced network functionalities within my homelab environment. Marge is equipped with a RAID 5 array, comprising four SATA HDDs, ensuring data redundancy and availability.
 
-In a typical Raspberry Pi setup, connecting SATA devices directly is not possible. However, with the help of the Raxda Rock Pi SATA HAT, Marge overcomes this limitation. The SATA HAT allows for the connection of up to four SATA devices to a single Raspberry Pi. It achieves this by utilizing the GPIO pins and USB 3 buses on the Raspberry Pi, enabling the SATA devices to be connected to the SATA HAT via its SATA ports.
+To seamlessly integrate Marge into the network, I've deployed Samba, an open-source implementation of the Server Message Block (SMB) protocol. Samba enables effortless file sharing and network integration, allowing other devices on the network to access and interact with the stored data. Whether it's a Windows, macOS, or Linux machine, Marge provides compatibility and interoperability, facilitating smooth file transfers, sharing, and collaborative workflows across different operating systems.
 
-By leveraging the power of Samba, Marge enables seamless access and interaction with the stored data from other devices on the network. Computers running Windows, macOS, or Linux can effortlessly connect to Marge and take advantage of the SMB protocol's compatibility and interoperability features. This allows for efficient file transfers, sharing, and collaborative workflows, regardless of the operating system being used.
+To expand Marge's capabilities, I've integrated additional services that enhance network security and privacy. First, I've set up a Pihole instance, utilizing Unbound as the DNS forwarder. Pihole acts as a DNS sinkhole, effectively blocking advertisements and trackers at the network level. With Pihole in place, all devices within the network benefit from network-wide ad-blocking, providing a cleaner and more streamlined browsing experience.
 
-Besides Samba, Marge also hosts a Pihole instance to provide network-wide ad-blocking capabilities. Pihole is a DNS sinkhole that blocks advertisements and trackers at the network level. Marge also provides a WireGuard VPN server to enable secure remote access to the homelab environment from anywhere in the world.
+In addition to ad-blocking, Marge serves as a WireGuard VPN server, ensuring secure remote access to the homelab environment. WireGuard, a modern and efficient VPN protocol, enables encrypted communication between external devices and the network. This allows me to connect to the homelab securely from anywhere in the world, accessing resources and services hosted on Marge with peace of mind.
+
+To overcome the limitations of connecting SATA devices directly to a Raspberry Pi, I've integrated the Raxda Rock Pi SATA HAT into Marge's setup. This HAT expands the Raspberry Pi's capabilities, allowing the connection of up to four SATA devices. By utilizing the GPIO pins and USB 3 buses, the SATA devices seamlessly integrate with Marge's storage infrastructure, providing reliable and expandable storage options.
+
+In summary, Marge serves as a robust NAS solution with Samba for seamless file sharing, Pihole with Unbound for network-wide ad-blocking, and WireGuard VPN for secure remote access. Together, these services create a reliable and secure storage environment while enhancing privacy and accessibility within my homelab setup.
 
 ## Setup Guide
 
