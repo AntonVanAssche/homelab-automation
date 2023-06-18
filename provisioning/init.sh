@@ -137,7 +137,7 @@ info "  DNS Server: ${DNS_SERVER}"
 
 cat << EOF > /etc/dhcpcd.conf
 interface eth0
-static ip_address=${MARGE_IP_ADDRESS}/${SUBNET_MASK_CIDR}
+static ip_address=${P_ADDRESS}/${SUBNET_MASK_CIDR}
 static routers=${DEFAULT_GATEWAY}
 static domain_name_servers=${DNS_SERVER}
 EOF
