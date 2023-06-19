@@ -281,27 +281,42 @@ curl -S -X DELETE -H "Content-Type: application/json" \
 
 apt install -y podman
 
+mkdir -p /home/"${USER_NAME}"/.config/systemd/user
+chown -R "${USER_NAME}":"${USER_NAME}" /var/lib/podman \
+    /home/"${USER_NAME}"/.config/systemd/user
+
 mkdir -p /var/lib/podman/volumes/configs/emby/config \
     /mnt/series \
     /mnt/movies \
     /mnt/documentaries
 
+chown -R "${USER_NAME}":"${USER_NAME}" /var/lib/podman/volumes/configs/emby \
+    /mnt/series \
+    /mnt/movies \
+    /mnt/documentaries
+
+sudo -u "${USER_NAME}"\
+    podman images -a --format "{{.Names}}" | grep "emby" &> /dev/null || \
+        sudo -u "${USER_NAME}"\
 podman run -d \
     --name emby \
     --env PUID=10000 \
     --env PGID=1000 \
     --env TZ="${TIMEZONE}" \
-    --volume /var/lib/podman/volumes/configs/emby:/config:Z \
-    --volume /mnt/series:/data/series:Z \
-    --volume /mnt/movies:/data/movies:Z \
-    --volume /mnt/documentaries:/data/documentaries:Z \
+                --volume /var/lib/podman/volumes/configs/emby:/config \
+                --volume /mnt/series:/data/series \
+                --volume /mnt/movies:/data/movies \
+                --volume /mnt/documentaries:/data/documentaries \
     --publish 8096:8096 \
     --device /dev/vchiq:/dev/vchiq \
     docker.io/emby/embyserver_arm64v8:latest
 
-podman generate systemd --new --name emby > /etc/systemd/system/emby.service
-systemctl daemon-reload
-systemctl enable --now emby.service
+sudo -u "${USER_NAME}" \
+    podman generate systemd --new --name emby > /home/"${USER_NAME}"/.config/systemd/user/emby.service
+sudo -u "${USER_NAME}" \
+    systemctl --user daemon-reload
+sudo -u "${USER_NAME}" \
+    systemctl --user enable --now emby.service
 
 mkdir -p /var/lib/podman/volumes/configs/transmission/config \
     /mnt/transmission/downloads \
