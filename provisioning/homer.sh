@@ -322,19 +322,32 @@ mkdir -p /var/lib/podman/volumes/configs/transmission/config \
     /mnt/transmission/downloads \
     /mnt/transmission/torrents
 
+chown -R "${USER_NAME}":"${USER_NAME}" /var/lib/podman/volumes/configs/transmission \
+    /mnt/transmission/downloads \
+    /mnt/transmission/torrents
+
+sudo -u "${USER_NAME}"\
+    podman images -a --format "{{.Names}}" | grep "transmission" &> /dev/null || \
+        sudo -u "${USER_NAME}"\
 podman run -d \
     --name transmission \
     --env PUID=10000 \
     --env PGID=1000 \
     --env TZ="${TIMEZONE}" \
-    --volume /var/lib/podman/volumes/configs/transmission/config:/config:Z \
-    --volume /mnt/transmission/downloads:/downloads:Z \
-    --volume /mnt/transmission/torrents:/watch:Z \
+                --volume /var/lib/podman/volumes/configs/transmission/config:/config \
+                --volume /mnt/transmission/downloads:/downloads \
+                --volume /mnt/transmission/torrents:/watch \
+                --volume /mnt/series:/emby/series \
+                --volume /mnt/movies:/emby/movies \
+                --volume /mnt/documentaries:/emby/documentaries \
     --publish 9300:9091/tcp \
     --publish 51413:51413/tcp \
     --publish 51413:51413/udp \
     lscr.io/linuxserver/transmission:latest
 
-podman generate systemd --new --name transmission > /etc/systemd/system/transmission.service
-systemctl daemon-reload
-systemctl enable --now transmission.service
+sudo -u "${USER_NAME}" \
+    podman generate systemd --new --name transmission > /home/"${USER_NAME}"/.config/systemd/user/transmission.service
+sudo -u "${USER_NAME}" \
+    systemctl --user daemon-reload
+sudo -u "${USER_NAME}" \
+    systemctl --user enable --now transmission.service
