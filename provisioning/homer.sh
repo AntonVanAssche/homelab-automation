@@ -75,15 +75,17 @@ cat << EOF > /etc/apache2/sites-available/reverse-proxy-http.conf
 <VirtualHost *:80>
     ServerName ${SERVER_DOMAIN}
     ServerAdmin webmaster@${SERVER_DOMAIN}
-    DocumentRoot /var/www/html
-</VirtualHost>
-EOF
 
-# Redirect all http traffic to https.
-cat << EOF > /var/www/html/.htaccess
-RewriteEngine On
-RewriteCond %{HTTPS} off
-RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
+    # Redirect HTTP traffic to HTTPS equivalent
+    RewriteEngine On
+    RewriteCond %{HTTPS} off
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+</VirtualHost>
+
+<VirtualHost *:80>
+   ServerName ${SERVER_DOMAIN}
+   Redirect permanent / ${SERVER_DOMAIN}
+</VirtualHost>
 EOF
 
 cat << EOF > /etc/apache2/sites-available/reverse-proxy-https.conf
@@ -298,18 +300,18 @@ chown -R "${USER_NAME}":"${USER_NAME}" /var/lib/podman/volumes/configs/emby \
 sudo -u "${USER_NAME}"\
     podman images -a --format "{{.Names}}" | grep "emby" &> /dev/null || \
         sudo -u "${USER_NAME}"\
-podman run -d \
-    --name emby \
-    --env PUID=10000 \
-    --env PGID=1000 \
-    --env TZ="${TIMEZONE}" \
+            podman run -d \
+                --name emby \
+                --env PUID=10000 \
+                --env PGID=1000 \
+                --env TZ="${TIMEZONE}" \
                 --volume /var/lib/podman/volumes/configs/emby:/config \
                 --volume /mnt/series:/data/series \
                 --volume /mnt/movies:/data/movies \
                 --volume /mnt/documentaries:/data/documentaries \
-    --publish 8096:8096 \
-    --device /dev/vchiq:/dev/vchiq \
-    docker.io/emby/embyserver_arm64v8:latest
+                --publish 8096:8096 \
+                --device /dev/vchiq:/dev/vchiq \
+                docker.io/emby/embyserver_arm64v8:latest
 
 sudo -u "${USER_NAME}" \
     podman generate systemd --new --name emby > /home/"${USER_NAME}"/.config/systemd/user/emby.service
@@ -329,21 +331,21 @@ chown -R "${USER_NAME}":"${USER_NAME}" /var/lib/podman/volumes/configs/transmiss
 sudo -u "${USER_NAME}"\
     podman images -a --format "{{.Names}}" | grep "transmission" &> /dev/null || \
         sudo -u "${USER_NAME}"\
-podman run -d \
-    --name transmission \
-    --env PUID=10000 \
-    --env PGID=1000 \
-    --env TZ="${TIMEZONE}" \
+            podman run -d \
+                --name transmission \
+                --env PUID=10000 \
+                --env PGID=1000 \
+                --env TZ="${TIMEZONE}" \
                 --volume /var/lib/podman/volumes/configs/transmission/config:/config \
                 --volume /mnt/transmission/downloads:/downloads \
                 --volume /mnt/transmission/torrents:/watch \
                 --volume /mnt/series:/emby/series \
                 --volume /mnt/movies:/emby/movies \
                 --volume /mnt/documentaries:/emby/documentaries \
-    --publish 9300:9091/tcp \
-    --publish 51413:51413/tcp \
-    --publish 51413:51413/udp \
-    lscr.io/linuxserver/transmission:latest
+                --publish 9300:9091/tcp \
+                --publish 51413:51413/tcp \
+                --publish 51413:51413/udp \
+                lscr.io/linuxserver/transmission:latest
 
 sudo -u "${USER_NAME}" \
     podman generate systemd --new --name transmission > /home/"${USER_NAME}"/.config/systemd/user/transmission.service
