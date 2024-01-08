@@ -119,11 +119,11 @@ for client_name in "${CLIENTS[@]}"; do
         tee "/etc/wireguard/clients/wg0-client-${client_name}.private.key" | \
         wg pubkey > "/etc/wireguard/clients/wg0-client-${client_name}.public.key"
     wg genpsk > "/etc/wireguard/clients/wg0-client-${client_name}.psk"
-    
+
     chmod 600 "/etc/wireguard/clients/wg0-client-${client_name}.private.key" \
         "/etc/wireguard/clients/wg0-client-${client_name}.public.key" \
         "/etc/wireguard/clients/wg0-client-${client_name}.psk"
-    
+
     info "Generating Wireguard configuration file for client ${client_name}."
     cat << EOF > "/etc/wireguard/clients/wg0-client-${client_name}.conf"
 [Interface]
@@ -155,7 +155,7 @@ EOF
     qrencode -t ansiutf8 < "/etc/wireguard/clients/wg0-client-${client_name}.conf"
     qrencode -t png -o "/etc/wireguard/clients/wg0-client-${client_name}.png" < "/etc/wireguard/clients/wg0-client-${client_name}.conf"
 
-    i=$((i++))
+    ((i++))
 done
 
 systemctl restart wg-quick@wg0
